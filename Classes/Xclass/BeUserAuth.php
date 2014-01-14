@@ -271,6 +271,7 @@ class ux_t3lib_beUserAuth extends t3lib_beUserAuth {
 			}
 
 		} elseif ($activeLogin || count($tempuserArr)) {
+			t3lib_utility_Http::setResponseCode(t3lib_utility_Http::HTTP_STATUS_401);
 			$this->loginFailure = TRUE;
 
 			if ($this->writeDevLog && !count($tempuserArr) && $activeLogin) {
