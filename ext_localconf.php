@@ -3,7 +3,8 @@ if (!defined('TYPO3_MODE')) {
 	die('Access denied.');
 }
 
-if ((class_exists('t3lib_utility_VersionNumber') && t3lib_utility_VersionNumber::convertVersionNumberToInteger(TYPO3_version) >= '6000000') ||
+if ((class_exists('t3lib_utility_VersionNumber') &&
+		t3lib_utility_VersionNumber::convertVersionNumberToInteger(TYPO3_version) >= '6000000') ||
 		t3lib_div::int_from_ver(TYPO3_version) >= '6000000') {
 	/** @noinspection PhpUndefinedVariableInspection */
 	\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addService(

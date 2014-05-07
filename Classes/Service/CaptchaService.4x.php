@@ -22,6 +22,9 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+/**
+ * Class Tx_MfcBeloginCaptcha_CaptchaService
+ */
 class Tx_MfcBeloginCaptcha_CaptchaService extends tx_sv_authbase {
 	/**
 	 * Settings Service
@@ -116,6 +119,8 @@ class Tx_MfcBeloginCaptcha_CaptchaService extends tx_sv_authbase {
 	}
 
 	/**
+	 * Proof if login fails greater than amount
+	 *
 	 * @param integer $amount
 	 * @return boolean
 	 */

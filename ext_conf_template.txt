@@ -22,8 +22,17 @@ use_ssl = 0
 # cat=plugin.mfcbelogincaptcha//07; type=options[,red,white,blackglass,clean,custom]; label= reCAPTCHA Theme: Predefined reCAPTCHA themes
 theme = blackglass
 
+# cat=plugin.mfcbelogincaptcha//09; type=string; label= reCAPTCHA Custom theme widget: A string with the ID of a DOM element in the widget template
+custom_theme_widget = recaptcha_widget
+
+# cat=plugin.mfcbelogincaptcha//09; type=string; label= reCAPTCHA Custom theme template: Template which contains the template of the widget
+widget_template = EXT:mfc_belogin_captcha/Resources/Private/Template/Captcha/Custom.html
+
+# cat=plugin.mfcbelogincaptcha//09; type=string; label= reCAPTCHA Custom theme stylesheets: Stylesheets
+widget_stylesheets = EXT:mfc_belogin_captcha/Resources/Public/Stylesheets/widget.css
+
 # cat=plugin.mfcbelogincaptcha//08; type=int+; label= reCAPTCHA TabIndex: TabIndex of reCAPTCHA field
-tabindex = 0
+tabindex = 3
 
 # cat=plugin.mfcbelogincaptcha//09; type=string; label= reCAPTCHA language: Language of reCAPTCHA frontend (autodetected if empty)
 lang =
