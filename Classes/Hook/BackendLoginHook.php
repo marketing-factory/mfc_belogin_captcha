@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class Tx_MfcBeloginCaptcha_Hook_BackendLoginHook
+ */
 class Tx_MfcBeloginCaptcha_Hook_BackendLoginHook {
 	/**
 	 * Settings Service

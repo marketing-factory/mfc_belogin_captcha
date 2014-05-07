@@ -23,6 +23,11 @@ namespace Mfc\MfcBeloginCaptcha\Service;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+/**
+ * Class CaptchaService
+ *
+ * @package Mfc\MfcBeloginCaptcha\Service
+ */
 class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService {
 	/**
 	 * Settings Service
@@ -95,6 +100,8 @@ class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService {
 	}
 
 	/**
+	 * Proof if login fails greater than amount
+	 *
 	 * @param integer $amount
 	 * @return boolean
 	 */
@@ -106,7 +113,7 @@ class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService {
 		$rows = $database->exec_SELECTgetRows(
 			'error',
 			'sys_log',
-			'type = 255 AND details_nr = 1 AND IP = \'' . $database->quoteStr($ip, 'sys_log') . '\'',
+			'type = 255 AND details_nr in (1,2) AND IP = \'' . $database->quoteStr($ip, 'sys_log') . '\'',
 			'',
 			'tstamp DESC',
 			$amount
