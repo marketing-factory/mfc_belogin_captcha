@@ -32,37 +32,40 @@
  * @package TYPO3
  * @subpackage mfc_belogin_captcha
  */
-class Tx_MfcBeloginCaptcha_SettingsService implements t3lib_Singleton {
-	/**
-	 * @var array
-	 */
-	protected $settings = NULL;
+class Tx_MfcBeloginCaptcha_SettingsService implements t3lib_Singleton
+{
+    /**
+     * @var array
+     */
+    protected $settings = null;
 
-	/**
-	 * Returns all settings.
-	 *
-	 * @return array
-	 */
-	public function getSettings() {
-		if ($this->settings === NULL) {
-			$this->settings = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['mfc_belogin_captcha']);
-		}
-		return $this->settings;
-	}
+    /**
+     * Returns all settings.
+     *
+     * @return array
+     */
+    public function getSettings()
+    {
+        if ($this->settings === null) {
+            $this->settings = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['mfc_belogin_captcha']);
+        }
+        return $this->settings;
+    }
 
-	/**
-	 * Returns the settings at path $path, which is separated by ".",
-	 * e.g. "pages.uid".
-	 * "pages.uid" would return $this->settings['pages']['uid'].
-	 *
-	 * If the path is invalid or no entry is found, false is returned.
-	 *
-	 * @param string $path
-	 * @return mixed
-	 */
-	public function getByPath($path) {
-		return Tx_Extbase_Reflection_ObjectAccess::getPropertyPath($this->getSettings(), $path);
-	}
+    /**
+     * Returns the settings at path $path, which is separated by ".",
+     * e.g. "pages.uid".
+     * "pages.uid" would return $this->settings['pages']['uid'].
+     *
+     * If the path is invalid or no entry is found, false is returned.
+     *
+     * @param string $path
+     * @return mixed
+     */
+    public function getByPath($path)
+    {
+        return Tx_Extbase_Reflection_ObjectAccess::getPropertyPath($this->getSettings(), $path);
+    }
 }
 
 ?>
