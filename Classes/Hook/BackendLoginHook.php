@@ -1,4 +1,6 @@
 <?php
+use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class Tx_MfcBeloginCaptcha_Hook_BackendLoginHook
@@ -22,9 +24,15 @@ class Tx_MfcBeloginCaptcha_Hook_BackendLoginHook
      */
     protected $captcha = null;
 
+    /**
+     * @var MarkerBasedTemplateService
+     */
+    protected $templateService;
+
     public function __construct()
     {
-        $this->settingsService = t3lib_div::makeInstance('Tx_MfcBeloginCaptcha_SettingsService');
+        $this->settingsService = GeneralUtility::makeInstance('Tx_MfcBeloginCaptcha_SettingsService');
+        $this->templateService = GeneralUtility::makeInstance(MarkerBasedTemplateService::class);
     }
 
     /**
@@ -52,9 +60,9 @@ class Tx_MfcBeloginCaptcha_Hook_BackendLoginHook
      */
     protected function loginFailureCountGreater($amount)
     {
-        /** @var t3lib_db $database */
+        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $database */
         $database = &$GLOBALS['TYPO3_DB'];
-        $ip = t3lib_div::getIndpEnv('REMOTE_ADDR');
+        $ip = GeneralUtility::getIndpEnv('REMOTE_ADDR');
 
         $rows = $database->exec_SELECTgetRows(
             'error',
@@ -110,8 +118,8 @@ class Tx_MfcBeloginCaptcha_Hook_BackendLoginHook
     protected function isSslActive()
     {
         return $this->settingsService->getByPath('use_ssl') ||
-        t3lib_div::getIndpEnv('TYPO3_SSL') ||
-        t3lib_div::getIndpEnv('TYPO3_PORT') == 443;
+        GeneralUtility::getIndpEnv('TYPO3_SSL') ||
+        GeneralUtility::getIndpEnv('TYPO3_PORT') == 443;
     }
 
     /**
@@ -121,23 +129,23 @@ class Tx_MfcBeloginCaptcha_Hook_BackendLoginHook
     protected function renderCaptchaError($form)
     {
         if (isset($GLOBALS['T3_VAR']['recaptcha_error'])) {
-            /** @var language $language */
+            /** @var \TYPO3\CMS\Lang\LanguageService $language */
             $language = $GLOBALS['LANG'];
             $language->includeLLFile('EXT:mfc_belogin_captcha/Resources/Private/Language/locallang.xml');
             $marker['ERROR_LOGIN_TITLE'] = $language->getLL('labels.recaptcha.error-title', true);
             $marker['ERROR_LOGIN_DESCRIPTION'] = $language->getLL('labels.recaptcha.error-' . $GLOBALS['T3_VAR']['recaptcha_error'],
                 true);
 
-            $template = t3lib_parsehtml::getSubpart($GLOBALS['TBE_TEMPLATE']->moduleTemplate, '###CAPTCHA_ERROR###');
-            $result = t3lib_parsehtml::substituteMarkerArray($template, $marker, '###|###');
+            $template = $this->templateService->getSubpart($GLOBALS['TBE_TEMPLATE']->moduleTemplate, '###CAPTCHA_ERROR###');
+            $result = $this->templateService->substituteMarkerArray($template, $marker, '###|###');
 
-            $errors = t3lib_parsehtml::getSubpart($form, '###LOGIN_ERROR###');
+            $errors = $this->templateService->getSubpart($form, '###LOGIN_ERROR###');
             $errors = substr($errors, 0, strrpos($errors, '</div>')) . $result . '</div>';
 
-            $form = t3lib_parsehtml::substituteSubpart($form, '###LOGIN_ERROR###', $errors);
+            $form = $this->templateService->substituteSubpart($form, '###LOGIN_ERROR###', $errors);
         }
 
-        $form = t3lib_parsehtml::substituteSubpart($form, '###CAPTCHA_ERROR###', '');
+        $form = $this->templateService->substituteSubpart($form, '###CAPTCHA_ERROR###', '');
 
         return $form;
     }
@@ -201,18 +209,18 @@ class Tx_MfcBeloginCaptcha_Hook_BackendLoginHook
     {
         $this->controller->content = str_replace(
             '/*###POSTCSSMARKER###*/',
-            t3lib_div::getUrl(t3lib_div::getFileAbsFileName($this->settingsService->getByPath('widget_stylesheets'))) . LF . '/*###POSTCSSMARKER###*/',
+            GeneralUtility::getUrl(GeneralUtility::getFileAbsFileName($this->settingsService->getByPath('widget_stylesheets'))) . LF . '/*###POSTCSSMARKER###*/',
             $this->controller->content
         );
 
-        $template = t3lib_div::getURL(t3lib_div::getFileAbsFileName($this->settingsService->getByPath('widget_template')));
+        $template = GeneralUtility::getURL(GeneralUtility::getFileAbsFileName($this->settingsService->getByPath('widget_template')));
 
         $marker = [
             'key' => $key,
             'protocol' => $this->isSslActive() ? 'https' : 'http',
         ];
 
-        return t3lib_parsehtml::substituteMarkerArray($template, $marker, '###|###', true);
+        return $this->templateService->substituteMarkerArray($template, $marker, '###|###', true);
     }
 }
 

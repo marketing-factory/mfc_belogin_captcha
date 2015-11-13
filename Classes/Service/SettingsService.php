@@ -23,6 +23,8 @@ namespace Mfc\MfcBeloginCaptcha\Service;
      *
      *  This copyright notice MUST APPEAR in all copies of the script!
      ***************************************************************/
+use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
 /**
  * Provide a way to get the configuration just everywhere
@@ -34,7 +36,7 @@ namespace Mfc\MfcBeloginCaptcha\Service;
  * @package TYPO3
  * @subpackage mfc_belogin_captcha
  */
-class SettingsService implements \TYPO3\CMS\Core\SingletonInterface
+class SettingsService implements SingletonInterface
 {
     /**
      * @var array
@@ -66,7 +68,7 @@ class SettingsService implements \TYPO3\CMS\Core\SingletonInterface
      */
     public function getByPath($path)
     {
-        return \TYPO3\CMS\Extbase\Reflection\ObjectAccess::getPropertyPath($this->getSettings(), $path);
+        return ObjectAccess::getPropertyPath($this->getSettings(), $path);
     }
 }
 

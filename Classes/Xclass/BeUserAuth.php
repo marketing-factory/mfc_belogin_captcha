@@ -1,6 +1,9 @@
 <?php
 
-class ux_t3lib_beUserAuth extends t3lib_beUserAuth
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\HttpUtility;
+
+class ux_t3lib_beUserAuth extends \TYPO3\CMS\Core\Authentication\BackendUserAuthentication
 {
     /**
      * Checks if a submission of username and password is present or use other authentication by auth services
@@ -26,7 +29,7 @@ class ux_t3lib_beUserAuth extends t3lib_beUserAuth
         $this->loginFailure = false;
 
         if ($this->writeDevLog) {
-            t3lib_div::devLog('Login type: ' . $this->loginType, 't3lib_userAuth');
+            GeneralUtility::devLog('Login type: ' . $this->loginType, 't3lib_userAuth');
         }
 
         // The info array provide additional information for auth services
@@ -36,7 +39,7 @@ class ux_t3lib_beUserAuth extends t3lib_beUserAuth
         $loginData = $this->getLoginFormData();
 
         if ($this->writeDevLog) {
-            t3lib_div::devLog('Login data: ' . t3lib_div::arrayToLogString($loginData), 't3lib_userAuth');
+            GeneralUtility::devLog('Login data: ' . GeneralUtility::arrayToLogString($loginData), 't3lib_userAuth');
         }
 
 
@@ -47,7 +50,7 @@ class ux_t3lib_beUserAuth extends t3lib_beUserAuth
                 $this->writelog(255, 2, 0, 2, 'User %s logged out', [$this->user['username']], '', 0, 0);
             } // Logout written to log
             if ($this->writeDevLog) {
-                t3lib_div::devLog('User logged out. Id: ' . $this->id, 't3lib_userAuth', -1);
+                GeneralUtility::devLog('User logged out. Id: ' . $this->id, 't3lib_userAuth', -1);
             }
 
             $this->logoff();
@@ -58,12 +61,12 @@ class ux_t3lib_beUserAuth extends t3lib_beUserAuth
             $activeLogin = true;
 
             if ($this->writeDevLog) {
-                t3lib_div::devLog('Active login (eg. with login form)', 't3lib_userAuth');
+                GeneralUtility::devLog('Active login (eg. with login form)', 't3lib_userAuth');
             }
 
             // check referer for submitted login values
             if ($this->formfield_status && $loginData['uident'] && $loginData['uname']) {
-                $httpHost = t3lib_div::getIndpEnv('TYPO3_HOST_ONLY');
+                $httpHost = GeneralUtility::getIndpEnv('TYPO3_HOST_ONLY');
                 if (!$this->getMethodEnabled && ($httpHost != $authInfo['refInfo']['host'] && !$GLOBALS['TYPO3_CONF_VARS']['SYS']['doNotCheckReferer'])) {
                     throw new RuntimeException(
                         'TYPO3 Fatal Error: Error: This host address ("' . $httpHost . '") and the referer host ("' . $authInfo['refInfo']['host'] . '") mismatches!<br />
@@ -95,7 +98,7 @@ class ux_t3lib_beUserAuth extends t3lib_beUserAuth
         // determine whether we need to skip session update.
         // This is used mainly for checking session timeout without
         // refreshing the session itself while checking.
-        if (t3lib_div::_GP('skipSessionUpdate')) {
+        if (GeneralUtility::_GP('skipSessionUpdate')) {
             $skipSessionUpdate = true;
         } else {
             $skipSessionUpdate = false;
@@ -107,11 +110,11 @@ class ux_t3lib_beUserAuth extends t3lib_beUserAuth
 
         if ($this->writeDevLog) {
             if ($haveSession) {
-                t3lib_div::devLog('User session found: ' . t3lib_div::arrayToLogString($authInfo['userSession'],
+                GeneralUtility::devLog('User session found: ' . GeneralUtility::arrayToLogString($authInfo['userSession'],
                         [$this->userid_column, $this->username_column]), 't3lib_userAuth', 0);
             }
             if (is_array($this->svConfig['setup'])) {
-                t3lib_div::devLog('SV setup: ' . t3lib_div::arrayToLogString($this->svConfig['setup']),
+                GeneralUtility::devLog('SV setup: ' . GeneralUtility::arrayToLogString($this->svConfig['setup']),
                     't3lib_userAuth', 0);
             }
         }
@@ -126,14 +129,14 @@ class ux_t3lib_beUserAuth extends t3lib_beUserAuth
             // first found user will be used
             $serviceChain = '';
             $subType = 'getUser' . $this->loginType;
-            while (is_object($serviceObj = t3lib_div::makeInstanceService('auth', $subType, $serviceChain))) {
+            while (is_object($serviceObj = GeneralUtility::makeInstanceService('auth', $subType, $serviceChain))) {
                 $serviceChain .= ',' . $serviceObj->getServiceKey();
                 $serviceObj->initAuth($subType, $loginData, $authInfo, $this);
                 if ($row = $serviceObj->getUser()) {
                     $tempuserArr[] = $row;
 
                     if ($this->writeDevLog) {
-                        t3lib_div::devLog('User found: ' . t3lib_div::arrayToLogString($row,
+                        GeneralUtility::devLog('User found: ' . GeneralUtility::arrayToLogString($row,
                                 [$this->userid_column, $this->username_column]), 't3lib_userAuth', 0);
                     }
 
@@ -147,16 +150,16 @@ class ux_t3lib_beUserAuth extends t3lib_beUserAuth
             unset($serviceObj);
 
             if ($this->writeDevLog && $this->svConfig['setup'][$this->loginType . '_alwaysFetchUser']) {
-                t3lib_div::devLog($this->loginType . '_alwaysFetchUser option is enabled', 't3lib_userAuth');
+                GeneralUtility::devLog($this->loginType . '_alwaysFetchUser option is enabled', 't3lib_userAuth');
             }
             if ($this->writeDevLog && $serviceChain) {
-                t3lib_div::devLog($subType . ' auth services called: ' . $serviceChain, 't3lib_userAuth');
+                GeneralUtility::devLog($subType . ' auth services called: ' . $serviceChain, 't3lib_userAuth');
             }
             if ($this->writeDevLog && !count($tempuserArr)) {
-                t3lib_div::devLog('No user found by services', 't3lib_userAuth');
+                GeneralUtility::devLog('No user found by services', 't3lib_userAuth');
             }
             if ($this->writeDevLog && count($tempuserArr)) {
-                t3lib_div::devLog(count($tempuserArr) . ' user records found by services', 't3lib_userAuth');
+                GeneralUtility::devLog(count($tempuserArr) . ' user records found by services', 't3lib_userAuth');
             }
         }
 
@@ -169,7 +172,7 @@ class ux_t3lib_beUserAuth extends t3lib_beUserAuth
             $authenticated = true;
 
             if ($this->writeDevLog) {
-                t3lib_div::devLog('User session used: ' . t3lib_div::arrayToLogString($authInfo['userSession'],
+                GeneralUtility::devLog('User session used: ' . GeneralUtility::arrayToLogString($authInfo['userSession'],
                         [$this->userid_column, $this->username_column]), 't3lib_userAuth');
             }
         }
@@ -179,7 +182,7 @@ class ux_t3lib_beUserAuth extends t3lib_beUserAuth
         if ($this->svConfig['setup'][$this->loginType . '_alwaysAuthUser']) {
             $authenticated = false;
             if ($this->writeDevLog) {
-                t3lib_div::devLog('alwaysAuthUser option is enabled', 't3lib_userAuth');
+                GeneralUtility::devLog('alwaysAuthUser option is enabled', 't3lib_userAuth');
             }
         }
 
@@ -194,12 +197,12 @@ class ux_t3lib_beUserAuth extends t3lib_beUserAuth
                 // a service might return 100 which means there's no reason to stop but the user can't be authenticated by that service
 
                 if ($this->writeDevLog) {
-                    t3lib_div::devLog('Auth user: ' . t3lib_div::arrayToLogString($tempuser), 't3lib_userAuth');
+                    GeneralUtility::devLog('Auth user: ' . GeneralUtility::arrayToLogString($tempuser), 't3lib_userAuth');
                 }
 
                 $serviceChain = '';
                 $subType = 'authUser' . $this->loginType;
-                while (is_object($serviceObj = t3lib_div::makeInstanceService('auth', $subType, $serviceChain))) {
+                while (is_object($serviceObj = GeneralUtility::makeInstanceService('auth', $subType, $serviceChain))) {
                     $serviceChain .= ',' . $serviceObj->getServiceKey();
                     $serviceObj->initAuth($subType, $loginData, $authInfo, $this);
                     if (($ret = $serviceObj->authUser($tempuser)) > 0) {
@@ -223,7 +226,7 @@ class ux_t3lib_beUserAuth extends t3lib_beUserAuth
                 unset($serviceObj);
 
                 if ($this->writeDevLog && $serviceChain) {
-                    t3lib_div::devLog($subType . ' auth services called: ' . $serviceChain, 't3lib_userAuth');
+                    GeneralUtility::devLog($subType . ' auth services called: ' . $serviceChain, 't3lib_userAuth');
                 }
 
                 if ($authenticated) {
@@ -256,46 +259,46 @@ class ux_t3lib_beUserAuth extends t3lib_beUserAuth
                     'User %s logged in from %s (%s)',
                     [
                         $tempuser[$this->username_column],
-                        t3lib_div::getIndpEnv('REMOTE_ADDR'),
-                        t3lib_div::getIndpEnv('REMOTE_HOST'),
+                        GeneralUtility::getIndpEnv('REMOTE_ADDR'),
+                        GeneralUtility::getIndpEnv('REMOTE_HOST'),
                     ],
                     '', '', '', -1, '', $tempuser['uid']
                 );
             }
 
             if ($this->writeDevLog && $activeLogin) {
-                t3lib_div::devLog('User ' . $tempuser[$this->username_column] . ' logged in from ' . t3lib_div::getIndpEnv('REMOTE_ADDR') . ' (' . t3lib_div::getIndpEnv('REMOTE_HOST') . ')',
+                GeneralUtility::devLog('User ' . $tempuser[$this->username_column] . ' logged in from ' . GeneralUtility::getIndpEnv('REMOTE_ADDR') . ' (' . GeneralUtility::getIndpEnv('REMOTE_HOST') . ')',
                     't3lib_userAuth', -1);
             }
             if ($this->writeDevLog && !$activeLogin) {
-                t3lib_div::devLog('User ' . $tempuser[$this->username_column] . ' authenticated from ' . t3lib_div::getIndpEnv('REMOTE_ADDR') . ' (' . t3lib_div::getIndpEnv('REMOTE_HOST') . ')',
+                GeneralUtility::devLog('User ' . $tempuser[$this->username_column] . ' authenticated from ' . GeneralUtility::getIndpEnv('REMOTE_ADDR') . ' (' . GeneralUtility::getIndpEnv('REMOTE_HOST') . ')',
                     't3lib_userAuth', -1);
             }
 
             if ($GLOBALS['TYPO3_CONF_VARS']['BE']['lockSSL'] == 3 && $this->user_table == 'be_users') {
-                $requestStr = substr(t3lib_div::getIndpEnv('TYPO3_REQUEST_SCRIPT'),
-                    strlen(t3lib_div::getIndpEnv('TYPO3_SITE_URL') . TYPO3_mainDir));
-                $backendScript = t3lib_BEfunc::getBackendScript();
-                if ($requestStr == $backendScript && t3lib_div::getIndpEnv('TYPO3_SSL')) {
-                    list(, $url) = explode('://', t3lib_div::getIndpEnv('TYPO3_SITE_URL'), 2);
+                $requestStr = substr(GeneralUtility::getIndpEnv('TYPO3_REQUEST_SCRIPT'),
+                    strlen(GeneralUtility::getIndpEnv('TYPO3_SITE_URL') . TYPO3_mainDir));
+                $backendScript = \TYPO3\CMS\Backend\Utility\BackendUtility::getBackendScript();
+                if ($requestStr == $backendScript && GeneralUtility::getIndpEnv('TYPO3_SSL')) {
+                    list(, $url) = explode('://', GeneralUtility::getIndpEnv('TYPO3_SITE_URL'), 2);
                     list($server, $address) = explode('/', $url, 2);
                     if (intval($GLOBALS['TYPO3_CONF_VARS']['BE']['lockSSLPort'])) {
                         $sslPortSuffix = ':' . intval($GLOBALS['TYPO3_CONF_VARS']['BE']['lockSSLPort']);
                         $server = str_replace($sslPortSuffix, '', $server); // strip port from server
                     }
-                    t3lib_utility_Http::redirect('http://' . $server . '/' . $address . TYPO3_mainDir . $backendScript);
+                    HttpUtility::redirect('http://' . $server . '/' . $address . TYPO3_mainDir . $backendScript);
                 }
             }
 
         } elseif ($activeLogin || count($tempuserArr)) {
-            t3lib_utility_Http::setResponseCode(t3lib_utility_Http::HTTP_STATUS_401);
+            HttpUtility::setResponseCode(HttpUtility::HTTP_STATUS_401);
             $this->loginFailure = true;
 
             if ($this->writeDevLog && !count($tempuserArr) && $activeLogin) {
-                t3lib_div::devLog('Login failed: ' . t3lib_div::arrayToLogString($loginData), 't3lib_userAuth', 2);
+                GeneralUtility::devLog('Login failed: ' . GeneralUtility::arrayToLogString($loginData), 't3lib_userAuth', 2);
             }
             if ($this->writeDevLog && count($tempuserArr)) {
-                t3lib_div::devLog('Login failed: ' . t3lib_div::arrayToLogString($tempuser,
+                GeneralUtility::devLog('Login failed: ' . GeneralUtility::arrayToLogString($tempuser,
                         [$this->userid_column, $this->username_column]), 't3lib_userAuth', 2);
             }
         }
@@ -304,7 +307,7 @@ class ux_t3lib_beUserAuth extends t3lib_beUserAuth
         // If there were a login failure, check to see if a warning email should be sent:
         if ($this->loginFailure && $activeLogin) {
             if ($this->writeDevLog) {
-                t3lib_div::devLog('Call checkLogFailures: ' . t3lib_div::arrayToLogString([
+                GeneralUtility::devLog('Call checkLogFailures: ' . GeneralUtility::arrayToLogString([
                         'warningEmail' => $this->warningEmail,
                         'warningPeriod' => $this->warningPeriod,
                         'warningMax' => $this->warningMax,
@@ -327,7 +330,7 @@ class ux_t3lib_beUserAuth extends t3lib_beUserAuth
     {
         $this->writelog(255, 3, 3, 1,
             'Login-attempt from %s (%s), username \'%s\', username unknown!',
-            [t3lib_div::getIndpEnv('REMOTE_ADDR'), t3lib_div::getIndpEnv('REMOTE_HOST'), $loginData['uname']]
+            [GeneralUtility::getIndpEnv('REMOTE_ADDR'), GeneralUtility::getIndpEnv('REMOTE_HOST'), $loginData['uname']]
         );
     }
 }

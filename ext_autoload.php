@@ -1,6 +1,6 @@
 <?php
 
-$extensionPath = t3lib_extMgm::extPath('mfc_belogin_captcha');
+$extensionPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('mfc_belogin_captcha');
 
 return [
     'tx_mfcbelogincaptcha_captchaservice' => $extensionPath . '/Classes/Service/CaptchaService.4x.php',

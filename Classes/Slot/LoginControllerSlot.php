@@ -23,6 +23,9 @@ namespace Mfc\MfcBeloginCaptcha\Slot;
      *
      *  This copyright notice MUST APPEAR in all copies of the script!
      ***************************************************************/
+use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class LoginControllerSlot
@@ -57,13 +60,20 @@ class LoginControllerSlot
      */
     protected $captcha = null;
 
+    /**
+     * @var MarkerBasedTemplateService
+     */
+    protected $templateService;
+
     public function __construct()
     {
-        if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('jm_recaptcha')) {
+        if (ExtensionManagementUtility::isLoaded('jm_recaptcha')) {
             /** @noinspection PhpIncludeInspection */
-            require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('jm_recaptcha') . 'class.tx_jmrecaptcha.php');
-            $this->captcha = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_jmrecaptcha');
+            require_once(ExtensionManagementUtility::extPath('jm_recaptcha') . 'class.tx_jmrecaptcha.php');
+            $this->captcha = GeneralUtility::makeInstance('tx_jmrecaptcha');
         }
+
+        $this->templateService = GeneralUtility::makeInstance(MarkerBasedTemplateService::class);
     }
 
     /**
@@ -97,7 +107,7 @@ class LoginControllerSlot
     {
         /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $database */
         $database = &$GLOBALS['TYPO3_DB'];
-        $ip = \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('REMOTE_ADDR');
+        $ip = GeneralUtility::getIndpEnv('REMOTE_ADDR');
 
         $rows = $database->exec_SELECTgetRows(
             'error',
@@ -157,8 +167,8 @@ class LoginControllerSlot
     protected function isSslActive()
     {
         return $this->settingsService->getByPath('use_ssl') ||
-        \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_SSL') ||
-        \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_PORT') == 443;
+        GeneralUtility::getIndpEnv('TYPO3_SSL') ||
+        GeneralUtility::getIndpEnv('TYPO3_PORT') == 443;
     }
 
     /**
@@ -177,18 +187,18 @@ class LoginControllerSlot
             $marker['ERROR_LOGIN_DESCRIPTION'] = $language->getLL('labels.recaptcha.error-' . $GLOBALS['T3_VAR']['recaptcha_error'],
                 true);
 
-            $template = \TYPO3\CMS\Core\Html\HtmlParser::getSubpart($GLOBALS['TBE_TEMPLATE']->moduleTemplate,
+            $template = $this->templateService->getSubpart($GLOBALS['TBE_TEMPLATE']->moduleTemplate,
                 '###CAPTCHA_ERROR###');
-            $result = \TYPO3\CMS\Core\Html\HtmlParser::substituteMarkerArray($template, $marker, '###|###');
+            $result = $this->templateService->substituteMarkerArray($template, $marker, '###|###');
 
-            $errors = \TYPO3\CMS\Core\Html\HtmlParser::getSubpart($form, '###LOGIN_ERROR###');
+            $errors = $this->templateService->getSubpart($form, '###LOGIN_ERROR###');
             $errors = substr($errors, 0, strrpos($errors, '</div>')) . $result . '</div>';
 
-            $form = \TYPO3\CMS\Core\Html\HtmlParser::substituteSubpart($form, '###LOGIN_ERROR###', $errors);
+            $form = $this->templateService->substituteSubpart($form, '###LOGIN_ERROR###', $errors);
 
         }
 
-        return \TYPO3\CMS\Core\Html\HtmlParser::substituteSubpart($form, '###CAPTCHA_ERROR###', '');
+        return $this->templateService->substituteSubpart($form, '###CAPTCHA_ERROR###', '');
     }
 
     /**
@@ -254,18 +264,18 @@ class LoginControllerSlot
     {
         $this->controller->content = str_replace(
             '/*###POSTCSSMARKER###*/',
-            \TYPO3\CMS\Core\Utility\GeneralUtility::getUrl(\TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName($this->settingsService->getByPath('widget_stylesheets'))) . LF . '/*###POSTCSSMARKER###*/',
+            GeneralUtility::getUrl(GeneralUtility::getFileAbsFileName($this->settingsService->getByPath('widget_stylesheets'))) . LF . '/*###POSTCSSMARKER###*/',
             $this->controller->content
         );
 
-        $template = \TYPO3\CMS\Core\Utility\GeneralUtility::getURL(\TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName($this->settingsService->getByPath('widget_template')));
+        $template = GeneralUtility::getURL(GeneralUtility::getFileAbsFileName($this->settingsService->getByPath('widget_template')));
 
         $marker = [
             'key' => $key,
             'protocol' => $this->isSslActive() ? 'https' : 'http',
         ];
 
-        return \TYPO3\CMS\Core\Html\HtmlParser::substituteMarkerArray($template, $marker, '###|###', true);
+        return $this->templateService->substituteMarkerArray($template, $marker, '###|###', true);
     }
 }
 

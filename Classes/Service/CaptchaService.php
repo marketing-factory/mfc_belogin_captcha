@@ -23,13 +23,15 @@ namespace Mfc\MfcBeloginCaptcha\Service;
      *
      *  This copyright notice MUST APPEAR in all copies of the script!
      ***************************************************************/
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Sv\AbstractAuthenticationService;
 
 /**
  * Class CaptchaService
  *
  * @package Mfc\MfcBeloginCaptcha\Service
  */
-class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService
+class CaptchaService extends AbstractAuthenticationService
 {
     /**
      * Settings Service
@@ -41,7 +43,7 @@ class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService
 
     public function __construct()
     {
-        $this->settingsService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('Mfc\\MfcBeloginCaptcha\\Service\\SettingsService');
+        $this->settingsService = GeneralUtility::makeInstance('Mfc\\MfcBeloginCaptcha\\Service\\SettingsService');
     }
 
     /**
@@ -61,8 +63,8 @@ class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService
             // read out challenge, answer and remote_addr
             $data = [
                 'remoteip' => $_SERVER['REMOTE_ADDR'],
-                'challenge' => trim(\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('recaptcha_challenge_field')),
-                'response' => trim(\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('recaptcha_response_field')),
+                'challenge' => trim(GeneralUtility::_GP('recaptcha_challenge_field')),
+                'response' => trim(GeneralUtility::_GP('recaptcha_response_field')),
                 'privatekey' => $this->settingsService->getByPath('private_key'),
             ];
 
@@ -96,9 +98,9 @@ class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService
         if (empty($verifyServerInfo)) {
             $response = [false, 'recaptcha-not-reachable'];
         } else {
-            $paramStr = \TYPO3\CMS\Core\Utility\GeneralUtility::implodeArrayForUrl('', $data);
-            $response = \TYPO3\CMS\Core\Utility\GeneralUtility::getURL($this->settingsService->getByPath('verify_server') . '?' . $paramStr);
-            $response = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(LF, $response);
+            $paramStr = GeneralUtility::implodeArrayForUrl('', $data);
+            $response = GeneralUtility::getURL($this->settingsService->getByPath('verify_server') . '?' . $paramStr);
+            $response = GeneralUtility::trimExplode(LF, $response);
         }
 
         return $response;
@@ -114,7 +116,7 @@ class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService
     {
         /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $database */
         $database = &$GLOBALS['TYPO3_DB'];
-        $ip = \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('REMOTE_ADDR');
+        $ip = GeneralUtility::getIndpEnv('REMOTE_ADDR');
 
         $rows = $database->exec_SELECTgetRows(
             'error',

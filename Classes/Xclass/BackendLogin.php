@@ -1,6 +1,9 @@
 <?php
 
-class ux_SC_index extends SC_index
+use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
+class ux_SC_index extends \TYPO3\CMS\Backend\Controller\LoginController
 {
     /**
      * Wrapping the login form table in another set of tables etc:
@@ -10,7 +13,10 @@ class ux_SC_index extends SC_index
      */
     public function wrapLoginForm($content)
     {
-        $mainContent = t3lib_parsehtml::getSubpart($GLOBALS['TBE_TEMPLATE']->moduleTemplate, '###PAGE###');
+        /** @var MarkerBasedTemplateService $templateService */
+        $templateService = GeneralUtility::makeInstance(MarkerBasedTemplateService::class);
+
+        $mainContent = $templateService->getSubpart($GLOBALS['TBE_TEMPLATE']->moduleTemplate, '###PAGE###');
 
         if ($GLOBALS['TBE_STYLES']['logo_login']) {
             $logo = '<img src="' . htmlspecialchars($GLOBALS['BACK_PATH'] . $GLOBALS['TBE_STYLES']['logo_login']) . '" alt="" />';
@@ -54,7 +60,7 @@ class ux_SC_index extends SC_index
             'SITENAME' => htmlspecialchars($GLOBALS['TYPO3_CONF_VARS']['SYS']['sitename']),
         ];
         $this->emitRenderLoginFormHook($markers);
-        return t3lib_parsehtml::substituteMarkerArray($mainContent, $markers, '###|###');
+        return $templateService->substituteMarkerArray($mainContent, $markers, '###|###');
     }
 
     /**
@@ -65,7 +71,7 @@ class ux_SC_index extends SC_index
     {
         if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['typo3/index.php']['renderLoginForm'])) {
             foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['typo3/index.php']['renderLoginForm'] as $classReference) {
-                $hookObject = &t3lib_div::getUserObj($classReference);
+                $hookObject = &GeneralUtility::getUserObj($classReference);
                 if (method_exists($hookObject, 'renderLoginForm')) {
                     $parameter = $hookObject->renderLoginForm($this, $markers);
                     $markers = $parameter[1];
