@@ -3,6 +3,10 @@ if (!defined('TYPO3_MODE')) {
     die('Access denied.');
 }
 
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][\TYPO3\CMS\Backend\Controller\LoginController::class] = [
+    'className' => \Mfc\MfcBeloginCaptcha\Controller\LoginController::class
+];
+
 /** @noinspection PhpUndefinedVariableInspection */
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addService(
     $_EXTKEY, 'auth', 'Mfc\\MfcBeloginCaptcha\\Service\\CaptchaService',

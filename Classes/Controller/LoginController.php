@@ -1,9 +1,10 @@
 <?php
+namespace Mfc\MfcBeloginCaptcha\Controller;
 
 use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class ux_SC_index extends \TYPO3\CMS\Backend\Controller\LoginController
+class LoginController extends \TYPO3\CMS\Backend\Controller\LoginController
 {
     /**
      * Wrapping the login form table in another set of tables etc:
