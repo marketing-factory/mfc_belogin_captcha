@@ -1,0 +1,19 @@
+{
+  "name": "mfc/mfc-belogin-captcha",
+  "description": "Add a configurable captcha to the backend login after a give amount of failed login tries",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Alexander Schnitzler",
+      "email": "typo3@alexanderschnitzler.de"
+    }
+  ],
+  "require": {
+    "php": ">=5.5.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Mfc\\MfcBeloginCaptcha\\": "Classes/"
+    }
+  }
+}

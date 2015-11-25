@@ -1,0 +1,2 @@
+# cat=plugin.mfcbelogincaptcha//00; type=int+; label= Failed logins before captcha gets rendered
+failedTries = 5
