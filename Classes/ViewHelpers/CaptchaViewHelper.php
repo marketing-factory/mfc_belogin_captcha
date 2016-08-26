@@ -23,7 +23,6 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractTagBasedViewHelper;
  */
 class CaptchaViewHelper extends AbstractTagBasedViewHelper
 {
-
     /**
      * @return string
      */
@@ -33,11 +32,11 @@ class CaptchaViewHelper extends AbstractTagBasedViewHelper
 
         $this->tag->addAttributes([
             'class' => 'g-recaptcha',
-            'data-sitekey' => $captchaService->getReCaptcha()
+            'data-sitekey' => $captchaService->getReCaptcha(),
+            'style' => 'overflow: hidden; margin: 9px 0; width: 304px;'
         ]);
         $this->tag->forceClosingTag(true);
 
         return $this->tag->render();
     }
-
 }
