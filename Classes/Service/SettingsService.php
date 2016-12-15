@@ -38,19 +38,21 @@ class SettingsService implements \TYPO3\CMS\Core\SingletonInterface
     /**
      * @var array
      */
-    protected $settings = null;
+    protected static $settings = [];
 
     /**
      * Returns all settings.
      *
+     * @param string $extensionKey
+     *
      * @return array
      */
-    public function getSettings()
+    public function getSettings($extensionKey = 'mfc_belogin_captcha')
     {
-        if ($this->settings === null) {
-            $this->settings = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['mfc_belogin_captcha']);
+        if (!isset(self::$settings[$extensionKey])) {
+            self::$settings[$extensionKey] = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$extensionKey]);
         }
-        return $this->settings;
+        return self::$settings[$extensionKey];
     }
 
     /**
