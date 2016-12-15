@@ -40,11 +40,9 @@ class CaptchaViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractTagBase
     {
         $this->prepareSettingsForCaptchaRendering();
 
-        $captchaService = $this->objectManager->get(CaptchaService::class);
-
         $this->tag->addAttributes([
             'class' => 'g-recaptcha',
-            'data-sitekey' => $captchaService->getReCaptcha(),
+            'data-sitekey' => $this->objectManager->get(CaptchaService::class)->getReCaptcha(),
             'style' => 'overflow: hidden; margin: 9px 0; width: 304px;'
         ]);
         $this->tag->forceClosingTag(true);
