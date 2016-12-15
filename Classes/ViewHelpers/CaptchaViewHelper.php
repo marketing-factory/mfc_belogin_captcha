@@ -25,6 +25,7 @@ namespace Mfc\MfcBeloginCaptcha\ViewHelpers;
  ***************************************************************/
 
 use Evoweb\Recaptcha\Services\CaptchaService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class CaptchaViewHelper
@@ -61,5 +62,9 @@ class CaptchaViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractTagBase
         $recaptchaSettings = array_merge($settingsService->getSettings('recaptcha'), $mfcBeloginCaptchaSettings);
 
         $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['recaptcha'] = serialize($recaptchaSettings);
+
+        if (!isset($recaptchaSettings['public_key']) || empty($recaptchaSettings['public_key'])) {
+            GeneralUtility::sysLog($message, 'mfc_belogin_captcha', GeneralUtility::SYSLOG_SEVERITY_WARNING);
+        }
     }
 }

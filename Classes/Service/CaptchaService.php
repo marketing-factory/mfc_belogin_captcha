@@ -25,6 +25,7 @@ namespace Mfc\MfcBeloginCaptcha\Service;
  ***************************************************************/
 
 use Mfc\MfcBeloginCaptcha\Utility\LoginFailureUtility;
+use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -35,9 +36,16 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService
 {
     /**
+     * User object
+     *
+     * @var BackendUserAuthentication
+     */
+    public $pObj;
+
+    /**
      * Settings Service
      *
-     * @var \Mfc\MfcBeloginCaptcha\Service\SettingsService
+     * @var SettingsService
      */
     protected $settingsService;
 
@@ -51,7 +59,7 @@ class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService
      */
     public function __construct()
     {
-        $this->settingsService = GeneralUtility::makeInstance('Mfc\\MfcBeloginCaptcha\\Service\\SettingsService');
+        $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
         $this->captchaService = GeneralUtility::makeInstance(\Evoweb\Recaptcha\Services\CaptchaService::class);
     }
 
@@ -73,6 +81,11 @@ class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService
 
             if (!$result['verified']) {
                 $statuscode = 0;
+                $this->pObj->writelog(255, 3, 3, 3, 'Login-attempt from %s (%s), captcha was not accepted!', [
+                    $this->authInfo['REMOTE_ADDR'],
+                    $this->authInfo['REMOTE_HOST'],
+                    $this->login['uname'],
+                ]);
             }
         }
 
