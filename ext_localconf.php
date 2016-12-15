@@ -1,9 +1,8 @@
 <?php
 defined('TYPO3_MODE') or die('Access denied.');
-/** @var string $_EXTKEY */
 
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addService(
-    $_EXTKEY,
+    'mfc_belogin_captcha',
     'auth',
     \Mfc\MfcBeloginCaptcha\Service\CaptchaService::class,
     [

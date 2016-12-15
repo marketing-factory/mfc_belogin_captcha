@@ -1,8 +1,10 @@
 <?php
+namespace Mfc\MfcBeloginCaptcha\Service;
+
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2013 Sebastian Fischer <typo@marketing-factory.de>
+ *  (c) 2015 Sebastian Fischer <typo3@marketing-factory.de>
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -21,20 +23,17 @@
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-namespace Mfc\MfcBeloginCaptcha\Service;
 
 use Mfc\MfcBeloginCaptcha\Utility\LoginFailureUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Sv\AbstractAuthenticationService;
 
 /**
  * Class CaptchaService
  *
  * @package Mfc\MfcBeloginCaptcha\Service
  */
-class CaptchaService extends AbstractAuthenticationService
+class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService
 {
-
     /**
      * Settings Service
      *
@@ -48,7 +47,7 @@ class CaptchaService extends AbstractAuthenticationService
     protected $captchaService;
 
     /**
-     * @return CaptchaService
+     * CaptchaService constructor.
      */
     public function __construct()
     {
@@ -60,10 +59,10 @@ class CaptchaService extends AbstractAuthenticationService
      * Method adds a further authUser method.
      *
      * Will return one of following authentication status codes:
-     * - 0 - captcha failed
-     * - 100 - just go on. User is not authenticated but there is still no reason to stop
+     *  - 0 - captcha failed
+     *  - 100 - just go on. User is not authenticated but there is still no reason to stop
      *
-     * @return integer Authentication statuscode, one of 0 or 100
+     * @return int Authentication statuscode, one of 0 or 100
      */
     public function authUser()
     {
@@ -79,5 +78,4 @@ class CaptchaService extends AbstractAuthenticationService
 
         return $statuscode;
     }
-
 }

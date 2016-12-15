@@ -1,9 +1,10 @@
 <?php
+namespace Mfc\MfcBeloginCaptcha\Service;
 
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2013 Sebastian Fischer <typo@marketing-factory.de>
+ *  (c) 2015 Sebastian Fischer <typo3@marketing-factory.de>
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -22,10 +23,6 @@
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-namespace Mfc\MfcBeloginCaptcha\Service;
-
-use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
 /**
  * Provide a way to get the configuration just everywhere
@@ -34,12 +31,10 @@ use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
  * $pluginSettingsService =
  * $this->objectManager->get('Tx_News_Service_SettingsService');
  *
- * @package TYPO3
- * @subpackage mfc_belogin_captcha
+ * @package Mfc\MfcBeloginCaptcha\ViewHelpers
  */
-class SettingsService implements SingletonInterface
+class SettingsService implements \TYPO3\CMS\Core\SingletonInterface
 {
-
     /**
      * @var array
      */
@@ -66,11 +61,11 @@ class SettingsService implements SingletonInterface
      * If the path is invalid or no entry is found, false is returned.
      *
      * @param string $path
+     *
      * @return mixed
      */
     public function getByPath($path)
     {
-        return ObjectAccess::getPropertyPath($this->getSettings(), $path);
+        return \TYPO3\CMS\Extbase\Reflection\ObjectAccess::getPropertyPath($this->getSettings(), $path);
     }
-
 }
