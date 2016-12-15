@@ -39,8 +39,6 @@ class CaptchaViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractTagBase
      */
     public function render()
     {
-        $this->prepareSettingsForCaptchaRendering();
-
         $this->tag->addAttributes([
             'class' => 'g-recaptcha',
             'data-sitekey' => $this->objectManager->get(CaptchaService::class)->getReCaptcha(),
@@ -49,22 +47,5 @@ class CaptchaViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractTagBase
         $this->tag->forceClosingTag(true);
 
         return $this->tag->render();
-    }
-
-    /**
-     * Filles extension settings of EXT:recaptcha with values of mfc_belogin_captcha
-     */
-    protected function prepareSettingsForCaptchaRendering()
-    {
-        $settingsService = $this->objectManager->get(\Mfc\MfcBeloginCaptcha\Service\SettingsService::class);
-
-        $mfcBeloginCaptchaSettings = $settingsService->getSettings('mfc_belogin_captcha');
-        $recaptchaSettings = array_merge($settingsService->getSettings('recaptcha'), $mfcBeloginCaptchaSettings);
-
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['recaptcha'] = serialize($recaptchaSettings);
-
-        if (!isset($recaptchaSettings['public_key']) || empty($recaptchaSettings['public_key'])) {
-            GeneralUtility::sysLog($message, 'mfc_belogin_captcha', GeneralUtility::SYSLOG_SEVERITY_WARNING);
-        }
     }
 }
