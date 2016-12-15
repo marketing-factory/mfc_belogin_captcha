@@ -25,7 +25,6 @@ namespace Mfc\MfcBeloginCaptcha\ViewHelpers;
  ***************************************************************/
 
 use Evoweb\Recaptcha\Services\CaptchaService;
-use Mfc\MfcBeloginCaptcha\Service\SettingsService;
 
 /**
  * Class CaptchaViewHelper
@@ -58,15 +57,11 @@ class CaptchaViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractTagBase
      */
     protected function prepareSettingsForCaptchaRendering()
     {
-        $settingsService = $this->objectManager->get(SettingsService::class);
-        $mfcBeloginCaptchaSettings = $settingsService->getSettings('mfc_belogin_captcha');
-        $recaptchaSettings = $settingsService->getSettings('recaptcha');
+        $settingsService = $this->objectManager->get(\Mfc\MfcBeloginCaptcha\Service\SettingsService::class);
 
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['recaptcha'] = array_merge(
-            $recaptchaSettings,
-            $mfcBeloginCaptchaSettings
-        );
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['recaptcha'] =
-            serialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['recaptcha']);
+        $mfcBeloginCaptchaSettings = $settingsService->getSettings('mfc_belogin_captcha');
+        $recaptchaSettings = array_merge($settingsService->getSettings('recaptcha'), $mfcBeloginCaptchaSettings);
+
+        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['recaptcha'] = serialize($recaptchaSettings);
     }
 }
