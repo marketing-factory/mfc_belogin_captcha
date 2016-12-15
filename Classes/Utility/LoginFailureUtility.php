@@ -31,7 +31,6 @@ namespace Mfc\MfcBeloginCaptcha\Utility;
  */
 class LoginFailureUtility
 {
-
     /**
      * @var array
      */
@@ -53,19 +52,22 @@ class LoginFailureUtility
                 $table
             );
 
+            // first we get all login related entries, successful and errors
             $rows = static::getDatabaseConnection()->exec_SELECTgetRows(
                 'error',
                 $table,
-                'type = 255 AND details_nr in (1,2) AND IP = ' . $ip,
+                'type = 255 AND details_nr IN (1,2) AND IP = ' . $ip . ' AND tstamp > (UNIX_TIMESTAMP(NOW()) - 86400)',
                 '',
                 'tstamp DESC',
                 $amount
             );
 
+            // filter away all non errors
             $rows = array_filter($rows, function ($row) {
                 return $row['error'] == 3 ? $row : '';
             });
 
+            // compare remaining count with required amount
             static::$register[$amount] = count($rows) == $amount;
         }
 
