@@ -50,8 +50,11 @@ class SettingsService implements \TYPO3\CMS\Core\SingletonInterface
     public function getSettings($extensionKey = 'mfc_belogin_captcha')
     {
         if (!isset(self::$settings[$extensionKey])) {
-            self::$settings[$extensionKey] = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$extensionKey]);
+            self::$settings[$extensionKey] = !is_array($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$extensionKey]) ?
+                unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$extensionKey]) :
+                $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$extensionKey];
         }
+
         return self::$settings[$extensionKey];
     }
 
@@ -69,5 +72,25 @@ class SettingsService implements \TYPO3\CMS\Core\SingletonInterface
     public function getByPath($path)
     {
         return \TYPO3\CMS\Extbase\Reflection\ObjectAccess::getPropertyPath($this->getSettings(), $path);
+    }
+
+
+    /**
+     * Filles extension settings of EXT:recaptcha with values of mfc_belogin_captcha
+     */
+    public function prepareRecaptchaSettings()
+    {
+        $mfcBeloginCaptchaSettings = $this->getSettings('mfc_belogin_captcha');
+        $recaptchaSettings = array_merge($this->getSettings('recaptcha'), $mfcBeloginCaptchaSettings);
+
+        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['recaptcha'] = serialize($recaptchaSettings);
+
+        if (!isset($recaptchaSettings['public_key']) || empty($recaptchaSettings['public_key'])) {
+            \TYPO3\CMS\Core\Utility\GeneralUtility::sysLog(
+                'Recaptcha public key was empty.',
+                'mfc_belogin_captcha',
+                \TYPO3\CMS\Core\Utility\GeneralUtility::SYSLOG_SEVERITY_WARNING
+            );
+        }
     }
 }

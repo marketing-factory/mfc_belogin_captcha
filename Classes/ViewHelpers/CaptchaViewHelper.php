@@ -24,8 +24,7 @@ namespace Mfc\MfcBeloginCaptcha\ViewHelpers;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use Evoweb\Recaptcha\Services\CaptchaService;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Mfc\MfcBeloginCaptcha\Service\SettingsService;
 
 /**
  * Class CaptchaViewHelper
@@ -35,35 +34,42 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class CaptchaViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractTagBasedViewHelper
 {
     /**
+     * @var SettingsService
+     */
+    public $settingsService = null;
+
+    /**
+     * CaptchaViewHelper constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->settingsService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(SettingsService::class);
+    }
+
+    /**
      * @return string
      */
     public function render()
     {
+        // do not render captcha if settings are not set
+        if (!$this->settingsService->getByPath('public_key')
+            || !$this->settingsService->getByPath('private_key')
+        ) {
+            return '';
+        }
+
+        $this->settingsService->prepareRecaptchaSettings();
+
         $this->tag->addAttributes([
             'class' => 'g-recaptcha',
-            'data-sitekey' => $this->objectManager->get(CaptchaService::class)->getReCaptcha(),
+            'data-sitekey' =>
+                $this->objectManager->get(\Evoweb\Recaptcha\Services\CaptchaService::class)->getReCaptcha(),
             'style' => 'overflow: hidden; margin: 9px 0; width: 304px;'
         ]);
         $this->tag->forceClosingTag(true);
 
         return $this->tag->render();
-    }
-
-    /**
-     * Filles extension settings of EXT:recaptcha with values of mfc_belogin_captcha
-     */
-    protected function prepareSettingsForCaptchaRendering()
-    {
-        $settingsService = $this->objectManager->get(\Mfc\MfcBeloginCaptcha\Service\SettingsService::class);
-
-        $mfcBeloginCaptchaSettings = $settingsService->getSettings('mfc_belogin_captcha');
-        $recaptchaSettings = array_merge($settingsService->getSettings('recaptcha'), $mfcBeloginCaptchaSettings);
-
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['recaptcha'] = serialize($recaptchaSettings);
-
-        if (!isset($recaptchaSettings['public_key']) || empty($recaptchaSettings['public_key'])) {
-            $message = 'Recaptcha public key was empty.';
-            GeneralUtility::sysLog($message, 'mfc_belogin_captcha', GeneralUtility::SYSLOG_SEVERITY_WARNING);
-        }
     }
 }

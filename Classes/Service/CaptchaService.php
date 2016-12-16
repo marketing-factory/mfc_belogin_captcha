@@ -76,7 +76,10 @@ class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService
     {
         $statuscode = 100;
 
-        if (LoginFailureUtility::failuresEqual($this->settingsService->getByPath('failedTries'))) {
+        if ($this->settingsService->getByPath('public_key')
+            && $this->settingsService->getByPath('private_key')
+            && LoginFailureUtility::failuresEqual($this->settingsService->getByPath('failedTries'))
+        ) {
             $result = $this->captchaService->validateReCaptcha();
 
             if (!$result['verified']) {

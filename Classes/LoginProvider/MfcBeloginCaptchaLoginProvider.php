@@ -37,9 +37,13 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
 class MfcBeloginCaptchaLoginProvider extends \TYPO3\CMS\Backend\LoginProvider\UsernamePasswordLoginProvider
 {
     /**
+     * Override render to set a different login template
+     *
      * @param StandaloneView $view
      * @param PageRenderer $pageRenderer
      * @param LoginController $loginController
+     *
+     * @return void
      */
     public function render(StandaloneView $view, PageRenderer $pageRenderer, LoginController $loginController)
     {
