@@ -1,8 +1,10 @@
 <?php
+namespace Mfc\MfcBeloginCaptcha\Service;
+
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2013 Sebastian Fischer <typo@marketing-factory.de>
+ *  (c) 2015 Sebastian Fischer <typo3@marketing-factory.de>
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -21,24 +23,29 @@
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-namespace Mfc\MfcBeloginCaptcha\Service;
 
 use Mfc\MfcBeloginCaptcha\Utility\LoginFailureUtility;
+use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Sv\AbstractAuthenticationService;
 
 /**
  * Class CaptchaService
  *
  * @package Mfc\MfcBeloginCaptcha\Service
  */
-class CaptchaService extends AbstractAuthenticationService
+class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService
 {
+    /**
+     * User object
+     *
+     * @var BackendUserAuthentication
+     */
+    public $pObj;
 
     /**
      * Settings Service
      *
-     * @var \Mfc\MfcBeloginCaptcha\Service\SettingsService
+     * @var SettingsService
      */
     protected $settingsService;
 
@@ -48,11 +55,11 @@ class CaptchaService extends AbstractAuthenticationService
     protected $captchaService;
 
     /**
-     * @return CaptchaService
+     * CaptchaService constructor.
      */
     public function __construct()
     {
-        $this->settingsService = GeneralUtility::makeInstance('Mfc\\MfcBeloginCaptcha\\Service\\SettingsService');
+        $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
         $this->captchaService = GeneralUtility::makeInstance(\Evoweb\Recaptcha\Services\CaptchaService::class);
     }
 
@@ -60,24 +67,31 @@ class CaptchaService extends AbstractAuthenticationService
      * Method adds a further authUser method.
      *
      * Will return one of following authentication status codes:
-     * - 0 - captcha failed
-     * - 100 - just go on. User is not authenticated but there is still no reason to stop
+     *  - 0 - captcha failed
+     *  - 100 - just go on. User is not authenticated but there is still no reason to stop
      *
-     * @return integer Authentication statuscode, one of 0 or 100
+     * @return int Authentication statuscode, one of 0 or 100
      */
     public function authUser()
     {
         $statuscode = 100;
 
-        if (LoginFailureUtility::failuresEqual($this->settingsService->getByPath('failedTries'))) {
+        if ($this->settingsService->getByPath('public_key')
+            && $this->settingsService->getByPath('private_key')
+            && LoginFailureUtility::failuresEqual($this->settingsService->getByPath('failedTries'))
+        ) {
             $result = $this->captchaService->validateReCaptcha();
 
             if (!$result['verified']) {
                 $statuscode = 0;
+                $this->pObj->writelog(255, 3, 3, 3, 'Login-attempt from %s (%s), captcha was not accepted!', [
+                    $this->authInfo['REMOTE_ADDR'],
+                    $this->authInfo['REMOTE_HOST'],
+                    $this->login['uname'],
+                ]);
             }
         }
 
         return $statuscode;
     }
-
 }
