@@ -2,6 +2,7 @@
   "name": "mfc/mfc-belogin-captcha",
   "description": "Add a configurable captcha to the backend login after a give amount of failed login tries",
   "license": "proprietary",
+  "type": "typo3-cms-extension",
   "authors": [
     {
       "name": "Alexander Schnitzler",
