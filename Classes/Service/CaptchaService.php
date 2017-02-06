@@ -84,11 +84,19 @@ class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService
 
             if (!$result['verified']) {
                 $statuscode = 0;
-                $this->pObj->writelog(255, 3, 3, 3, 'Login-attempt from %s (%s), captcha was not accepted!', [
+                $this->pObj->writelog(
+                    255,
+                    3,
+                    3,
+                    3,
+                    'Login-attempt from %s (%s) for %s, captcha was not accepted! (ERROR: %s)',
+                    [
                     $this->authInfo['REMOTE_ADDR'],
                     $this->authInfo['REMOTE_HOST'],
                     $this->login['uname'],
-                ]);
+                    $result['error'],
+                    ]
+                );
             }
         }
 
