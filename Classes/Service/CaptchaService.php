@@ -89,12 +89,13 @@ class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService
                     3,
                     3,
                     3,
-                    'Login-attempt from %s (%s) for %s, captcha was not accepted! (ERROR: %s)',
+                    'Login-attempt from %s (%s) for %s, captcha was not accepted! (Result: %s ERROR: %s)',
                     [
-                    $this->authInfo['REMOTE_ADDR'],
-                    $this->authInfo['REMOTE_HOST'],
-                    $this->login['uname'],
-                    $result['error'],
+                        $this->authInfo['REMOTE_ADDR'],
+                        $this->authInfo['REMOTE_HOST'],
+                        $this->login['uname'],
+                        $result['success'],
+                        $result['error'],
                     ]
                 );
             }
