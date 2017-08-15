@@ -74,7 +74,7 @@ class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService
      */
     public function authUser()
     {
-        $statuscode = 100;
+        $statusCode = 100;
 
         if ($this->settingsService->getByPath('public_key')
             && $this->settingsService->getByPath('private_key')
@@ -83,7 +83,7 @@ class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService
             $result = $this->captchaService->validateReCaptcha();
 
             if (!$result['verified']) {
-                $statuscode = 0;
+                $statusCode = 0;
                 $this->pObj->writelog(
                     255,
                     3,
@@ -101,6 +101,6 @@ class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService
             }
         }
 
-        return $statuscode;
+        return $statusCode;
     }
 }
