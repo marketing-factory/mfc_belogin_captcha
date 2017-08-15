@@ -24,6 +24,8 @@ namespace Mfc\MfcBeloginCaptcha\Utility;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use TYPO3\CMS\Core\Database\Connection;
+
 /**
  * Class LoginFailureCountViewHelper
  *
@@ -34,7 +36,7 @@ class LoginFailureUtility
     /**
      * @var array
      */
-    static protected $register;
+    protected static $register;
 
     /**
      * @param int $amount
@@ -47,20 +49,32 @@ class LoginFailureUtility
 
         if (!isset(static::$register[$amount])) {
             $table = 'sys_log';
-            $ip = static::getDatabaseConnection()->fullQuoteStr(
-                \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('REMOTE_ADDR'),
-                $table
-            );
 
-            // first we get all login related entries, successful and errors
-            $rows = static::getDatabaseConnection()->exec_SELECTgetRows(
-                'error',
-                $table,
-                'type = 255 AND details_nr IN (1,2) AND IP = ' . $ip . ' AND tstamp > (UNIX_TIMESTAMP(NOW()) - 86400)',
-                '',
-                'tstamp DESC',
-                $amount
-            );
+            $queryBuilder = self::getQueryBuilderForTable($table);
+            $queryBuilder->getRestrictions()->removeAll();
+            $expression = $queryBuilder->expr();
+            $rows = $queryBuilder
+                ->select('error')
+                ->from($table)
+                ->where(
+                    $expression->eq('type', $queryBuilder->createNamedParameter(255, \PDO::PARAM_INT)),
+                    $expression->in(
+                        'details_nr',
+                        $queryBuilder->createNamedParameter([1,2], Connection::PARAM_INT_ARRAY)
+                    ),
+                    $expression->eq(
+                        'IP',
+                        $queryBuilder->createNamedParameter(
+                            \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('REMOTE_ADDR'),
+                            \PDO::PARAM_STR
+                        )
+                    ),
+                    $expression->gt('tstamp', $queryBuilder->createNamedParameter(time() - 86400, \PDO::PARAM_INT))
+                )
+                ->orderBy('tstamp', \TYPO3\CMS\Extbase\Persistence\QueryInterface::ORDER_DESCENDING)
+                ->setMaxResults($amount)
+                ->execute()
+                ->fetchAll();
 
             // filter away all non errors
             $rows = array_filter($rows, function ($row) {
@@ -75,10 +89,14 @@ class LoginFailureUtility
     }
 
     /**
-     * @return \TYPO3\CMS\Core\Database\DatabaseConnection
+     * @param string $table
+     *
+     * @return \TYPO3\CMS\Core\Database\Query\QueryBuilder
      */
-    protected static function getDatabaseConnection()
+    protected static function getQueryBuilderForTable($table): \TYPO3\CMS\Core\Database\Query\QueryBuilder
     {
-        return $GLOBALS['TYPO3_DB'];
+        return \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+            \TYPO3\CMS\Core\Database\ConnectionPool::class
+        )->getQueryBuilderForTable($table);
     }
 }
