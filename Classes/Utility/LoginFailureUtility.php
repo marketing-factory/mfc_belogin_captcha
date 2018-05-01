@@ -1,4 +1,6 @@
 <?php
+namespace Mfc\MfcBeloginCaptcha\Utility;
+
 /**
  * This file is part of the TYPO3 CMS project.
  *
@@ -11,47 +13,42 @@
  *
  * The TYPO3 project - inspiring people to share!
  */
-namespace Mfc\MfcBeloginCaptcha\Utility;
 
-use TYPO3\CMS\Core\Database\DatabaseConnection;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-
-/**
- * Class LoginFailureCountViewHelper
- * @package Mfc\MfcBeloginCaptcha\ViewHelpers
- */
 class LoginFailureUtility
 {
-
     /**
      * @var array
      */
-    static protected $register;
+    protected static $register;
 
     /**
      * @param int $amount
      *
      * @return bool
      */
-    static public function failuresEqual($amount)
+    public static function failuresEqual($amount)
     {
         $amount = (int) $amount;
 
         if (!isset(static::$register[$amount])) {
-            $table = 'sys_log';
-            $ip = static::getDatabaseConnection()->fullQuoteStr(
-                GeneralUtility::getIndpEnv('REMOTE_ADDR'),
-                $table
-            );
+            $ip = \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('REMOTE_ADDR');
 
-            $rows = static::getDatabaseConnection()->exec_SELECTgetRows(
-                'error',
-                $table,
-                'type = 255 AND details_nr in (1,2) AND IP = ' . $ip,
-                '',
-                'tstamp DESC',
-                $amount
-            );
+            $queryBuilder = self::getQueryBuilderForTable('sys_log');
+            $rows = $queryBuilder
+                ->select('error')
+                ->from('sys_log')
+                ->where(
+                    $queryBuilder->expr()->eq('type', 255),
+                    $queryBuilder->expr()->in(
+                        'details_nr',
+                        $queryBuilder->createNamedParameter([1, 2], \Doctrine\DBAL\Connection::PARAM_STR_ARRAY)
+                    ),
+                    $queryBuilder->expr()->eq('IP', $queryBuilder->createNamedParameter($ip, \PDO::PARAM_STR))
+                )
+                ->orderBy('tstamp', 'DESC')
+                ->setMaxResults($amount)
+                ->execute()
+                ->fetchAll();
 
             $rows = array_filter($rows, function ($row) {
                 return $row['error'] == 3 ? $row : '';
@@ -63,12 +60,17 @@ class LoginFailureUtility
         return static::$register[$amount];
     }
 
-    /**
-     * @return DatabaseConnection
-     */
-    static protected function getDatabaseConnection()
+    protected static function getQueryBuilderForTable(string $table): \TYPO3\CMS\Core\Database\Query\QueryBuilder
     {
-        return $GLOBALS['TYPO3_DB'];
-    }
+        /** @var \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager */
+        $objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+            \TYPO3\CMS\Extbase\Object\ObjectManager::class
+        );
+        /** @var \TYPO3\CMS\Core\Database\Query\QueryBuilder $queryBuilder */
+        $queryBuilder = $objectManager
+            ->get(\TYPO3\CMS\Core\Database\ConnectionPool::class)
+            ->getQueryBuilderForTable($table);
 
+        return $queryBuilder;
+    }
 }

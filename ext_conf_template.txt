@@ -1,2 +1,5 @@
 # cat=plugin.mfcbelogincaptcha//00; type=int+; label= Failed logins before captcha gets rendered
 failedTries = 5
+
+# cat=plugin.mfcbelogincaptcha//00; type=boolean; label= Use invisible recaptcha instead of visible checkbox
+useInvisible = 0

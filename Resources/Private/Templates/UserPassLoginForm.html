@@ -1,0 +1,45 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+			xmlns:mfc="http://typo3.org/ns/Mfc/MfcBeloginCaptcha/ViewHelpers"
+			data-namespace-typo3-fluid="true">
+
+<f:layout name="Login"/>
+
+<f:section name="loginFormFields">
+	<div class="form-group t3js-login-username-section" id="t3-login-username-section">
+		<div class="form-control-wrap">
+			<div class="form-control-holder">
+				<input type="text" id="t3-username" name="username" value="{presetUsername}" placeholder="{f:translate(key: 'login.username')}" class="form-control input-login t3js-clearable t3js-login-username-field" autofocus="autofocus" required="required" />
+				<div class="form-notice-capslock hidden t3js-login-alert-capslock">
+					<img src="{images.capslock}" width="14" height="14" alt="{f:translate(key: 'login.error.capslock')}" title="{f:translate(key: 'login.error.capslock')}" />
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="form-group t3js-login-password-section" id="t3-login-password-section">
+		<div class="form-control-wrap">
+			<div class="form-control-holder">
+				<input type="password" id="t3-password" name="p_field" value="{presetPassword}" placeholder="{f:translate(key: 'login.password')}" class="form-control input-login t3js-clearable t3js-login-password-field" required="required" data-rsa-encryption="t3-field-userident" />
+				<div class="form-notice-capslock hidden t3js-login-alert-capslock">
+					<img src="{images.capslock}" width="14" height="14" alt="{f:translate(key: 'login.error.capslock')}" title="{f:translate(key: 'login.error.capslock')}" />
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<mfc:ifTooManyAuthenticationFailures>
+		<link rel="stylesheet" type="text/css" href="{f:uri.resource(path: 'Css/Styles.css', extensionName: 'MfcBeloginCaptcha')}" media="all">
+
+		<div class="form-group" id="g-recaptcha">
+			<div class="form-control-wrap">
+				<div class="form-control-holder">
+					<mfc:captcha/>
+				</div>
+			</div>
+		</div>
+
+		<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+	</mfc:ifTooManyAuthenticationFailures>
+</f:section>
+
+</html>

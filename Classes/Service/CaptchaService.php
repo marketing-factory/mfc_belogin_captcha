@@ -1,4 +1,6 @@
 <?php
+namespace Mfc\MfcBeloginCaptcha\Service;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -21,20 +23,11 @@
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-namespace Mfc\MfcBeloginCaptcha\Service;
 
-use Mfc\MfcBeloginCaptcha\Utility\LoginFailureUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Sv\AbstractAuthenticationService;
 
-/**
- * Class CaptchaService
- *
- * @package Mfc\MfcBeloginCaptcha\Service
- */
-class CaptchaService extends AbstractAuthenticationService
+class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService
 {
-
     /**
      * Settings Service
      *
@@ -48,11 +41,11 @@ class CaptchaService extends AbstractAuthenticationService
     protected $captchaService;
 
     /**
-     * @return CaptchaService
+     * Constructor
      */
     public function __construct()
     {
-        $this->settingsService = GeneralUtility::makeInstance('Mfc\\MfcBeloginCaptcha\\Service\\SettingsService');
+        $this->settingsService = GeneralUtility::makeInstance(\Mfc\MfcBeloginCaptcha\Service\SettingsService::class);
         $this->captchaService = GeneralUtility::makeInstance(\Evoweb\Recaptcha\Services\CaptchaService::class);
     }
 
@@ -63,21 +56,22 @@ class CaptchaService extends AbstractAuthenticationService
      * - 0 - captcha failed
      * - 100 - just go on. User is not authenticated but there is still no reason to stop
      *
-     * @return integer Authentication statuscode, one of 0 or 100
+     * @return int Authentication statuscode, one of 0 or 100
      */
     public function authUser()
     {
-        $statuscode = 100;
+        $statusCode = 100;
 
-        if (LoginFailureUtility::failuresEqual($this->settingsService->getByPath('failedTries'))) {
+        if (\Mfc\MfcBeloginCaptcha\Utility\LoginFailureUtility::failuresEqual(
+            $this->settingsService->getByPath('failedTries')
+        )) {
             $result = $this->captchaService->validateReCaptcha();
 
             if (!$result['verified']) {
-                $statuscode = 0;
+                $statusCode = 0;
             }
         }
 
-        return $statuscode;
+        return $statusCode;
     }
-
 }

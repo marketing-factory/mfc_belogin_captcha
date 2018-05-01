@@ -1,4 +1,5 @@
 <?php
+namespace Mfc\MfcBeloginCaptcha\Service;
 
 /***************************************************************
  *  Copyright notice
@@ -22,24 +23,15 @@
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-namespace Mfc\MfcBeloginCaptcha\Service;
-
-use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
 /**
  * Provide a way to get the configuration just everywhere
  *
- * Example
- * $pluginSettingsService =
- * $this->objectManager->get('Tx_News_Service_SettingsService');
- *
- * @package TYPO3
- * @subpackage mfc_belogin_captcha
+ * Example:
+ *   $pluginSettings = GeneralUtility::makeInstance(SettingsService::class)->getSettings();
  */
-class SettingsService implements SingletonInterface
+class SettingsService implements \TYPO3\CMS\Core\SingletonInterface
 {
-
     /**
      * @var array
      */
@@ -52,8 +44,14 @@ class SettingsService implements SingletonInterface
      */
     public function getSettings()
     {
-        if ($this->settings === null) {
-            $this->settings = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['mfc_belogin_captcha']);
+        if (is_null($this->settings)) {
+            if (class_exists(\TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class)) {
+                $this->settings = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+                    \TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class
+                )->get('mfc_belogin_captcha');
+            } else {
+                $this->settings = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['mfc_belogin_captcha']);
+            }
         }
         return $this->settings;
     }
@@ -66,11 +64,11 @@ class SettingsService implements SingletonInterface
      * If the path is invalid or no entry is found, false is returned.
      *
      * @param string $path
+     *
      * @return mixed
      */
     public function getByPath($path)
     {
-        return ObjectAccess::getPropertyPath($this->getSettings(), $path);
+        return \TYPO3\CMS\Extbase\Reflection\ObjectAccess::getPropertyPath($this->getSettings(), $path);
     }
-
 }

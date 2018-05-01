@@ -1,4 +1,6 @@
 <?php
+namespace Mfc\MfcBeloginCaptcha\ViewHelpers;
+
 /**
  * This file is part of the TYPO3 CMS project.
  *
@@ -11,39 +13,31 @@
  *
  * The TYPO3 project - inspiring people to share!
  */
-namespace Mfc\MfcBeloginCaptcha\ViewHelpers;
 
-use Mfc\MfcBeloginCaptcha\Service\SettingsService;
-use Mfc\MfcBeloginCaptcha\Utility\LoginFailureUtility;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractConditionViewHelper;
 
-/**
- * Class TooManyAuthenticationFailures
- * @package Mfc\MfcBeloginCaptcha\ViewHelpers
- */
 class IfTooManyAuthenticationFailuresViewHelper extends AbstractConditionViewHelper
 {
-
     /**
-     * @var SettingsService
+     * @var \Mfc\MfcBeloginCaptcha\Service\SettingsService
      */
-    static public $settingsService = null;
+    public static $settingsService = null;
 
     /**
      * @param array $arguments
      *
      * @return bool
      */
-    static protected function evaluateCondition($arguments = null)
+    protected static function evaluateCondition($arguments = null)
     {
         if (static::$settingsService === null) {
-            static::$settingsService = GeneralUtility::makeInstance(SettingsService::class);
+            static::$settingsService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+                \Mfc\MfcBeloginCaptcha\Service\SettingsService::class
+            );
         }
 
-        return LoginFailureUtility::failuresEqual(
+        return \Mfc\MfcBeloginCaptcha\Utility\LoginFailureUtility::failuresEqual(
             static::$settingsService->getByPath('failedTries')
         );
     }
-
 }
