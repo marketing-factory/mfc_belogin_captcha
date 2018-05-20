@@ -4,7 +4,7 @@ namespace Mfc\MfcBeloginCaptcha\Service;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2013 Sebastian Fischer <typo@marketing-factory.de>
+ *  (c) 2015 Sebastian Fischer <typo3@marketing-factory.de>
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -27,33 +27,43 @@ namespace Mfc\MfcBeloginCaptcha\Service;
 /**
  * Provide a way to get the configuration just everywhere
  *
- * Example:
- *   $pluginSettings = GeneralUtility::makeInstance(SettingsService::class)->getSettings();
+ * Example
+ * $pluginSettingsService =
+ * $this->objectManager->get('Tx_News_Service_SettingsService');
+ *
+ * @package Mfc\MfcBeloginCaptcha\ViewHelpers
  */
 class SettingsService implements \TYPO3\CMS\Core\SingletonInterface
 {
     /**
      * @var array
      */
-    protected $settings = null;
+    protected static $settings = [];
 
     /**
      * Returns all settings.
      *
+     * @param string $extensionKey
+     *
      * @return array
      */
-    public function getSettings()
+    public function getSettings($extensionKey = 'mfc_belogin_captcha')
     {
-        if (is_null($this->settings)) {
+        if (!isset(self::$settings[$extensionKey])) {
             if (class_exists(\TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class)) {
                 $this->settings = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
                     \TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class
                 )->get('mfc_belogin_captcha');
             } else {
-                $this->settings = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['mfc_belogin_captcha']);
+                self::$settings[$extensionKey] = !is_array(
+                    $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$extensionKey]
+                ) ?
+                    unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$extensionKey]) :
+                    $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$extensionKey];
             }
         }
-        return $this->settings;
+
+        return self::$settings[$extensionKey];
     }
 
     /**
@@ -70,5 +80,25 @@ class SettingsService implements \TYPO3\CMS\Core\SingletonInterface
     public function getByPath($path)
     {
         return \TYPO3\CMS\Extbase\Reflection\ObjectAccess::getPropertyPath($this->getSettings(), $path);
+    }
+
+
+    /**
+     * Filles extension settings of EXT:recaptcha with values of mfc_belogin_captcha
+     */
+    public function prepareRecaptchaSettings()
+    {
+        $mfcBeloginCaptchaSettings = $this->getSettings('mfc_belogin_captcha');
+        $recaptchaSettings = array_merge($this->getSettings('recaptcha'), $mfcBeloginCaptchaSettings);
+
+        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['recaptcha'] = serialize($recaptchaSettings);
+
+        if (!isset($recaptchaSettings['public_key']) || empty($recaptchaSettings['public_key'])) {
+            \TYPO3\CMS\Core\Utility\GeneralUtility::sysLog(
+                'Recaptcha public key was empty.',
+                'mfc_belogin_captcha',
+                \TYPO3\CMS\Core\Utility\GeneralUtility::SYSLOG_SEVERITY_WARNING
+            );
+        }
     }
 }

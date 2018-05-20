@@ -13,11 +13,9 @@
 			"email": "typo3@alexanderschnitzler.de"
 		}
 	],
-
 	"require": {
-		"php": ">=5.5.0"
+		"php": ">=7.0.0"
 	},
-
 	"autoload": {
 		"psr-4": {
 			"Mfc\\MfcBeloginCaptcha\\": "Classes/"
