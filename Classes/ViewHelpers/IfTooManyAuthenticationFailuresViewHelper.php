@@ -26,11 +26,6 @@ namespace Mfc\MfcBeloginCaptcha\ViewHelpers;
 
 use Mfc\MfcBeloginCaptcha\Service\SettingsService;
 
-/**
- * Class TooManyAuthenticationFailures
- *
- * @package Mfc\MfcBeloginCaptcha\ViewHelpers
- */
 class IfTooManyAuthenticationFailuresViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractConditionViewHelper
 {
     /**

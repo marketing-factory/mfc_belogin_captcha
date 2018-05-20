@@ -25,7 +25,6 @@ namespace Mfc\MfcBeloginCaptcha\Service;
  ***************************************************************/
 
 use Mfc\MfcBeloginCaptcha\Utility\LoginFailureUtility;
-use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -38,7 +37,7 @@ class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService
     /**
      * User object
      *
-     * @var BackendUserAuthentication
+     * @var \TYPO3\CMS\Core\Authentication\BackendUserAuthentication
      */
     public $pObj;
 

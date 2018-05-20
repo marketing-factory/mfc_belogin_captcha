@@ -30,12 +30,7 @@ use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
-/**
- * Class MfcBeloginCaptchaLoginProvider
- *
- * @package Mfc\MfcBeloginCaptcha\LoginProvider
- */
-class MfcBeloginCaptchaLoginProvider extends \TYPO3\CMS\Backend\LoginProvider\UsernamePasswordLoginProvider
+class MfcBeloginCaptchaLoginProvider extends UsernamePasswordLoginProvider
 {
     /**
      * Override render to set a different login template

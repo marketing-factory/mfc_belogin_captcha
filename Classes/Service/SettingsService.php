@@ -51,7 +51,7 @@ class SettingsService implements \TYPO3\CMS\Core\SingletonInterface
     {
         if (!isset(self::$settings[$extensionKey])) {
             if (class_exists(\TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class)) {
-                $this->settings = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+                self::$settings[$extensionKey] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
                     \TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class
                 )->get('mfc_belogin_captcha');
             } else {
@@ -94,10 +94,14 @@ class SettingsService implements \TYPO3\CMS\Core\SingletonInterface
         $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['recaptcha'] = serialize($recaptchaSettings);
 
         if (!isset($recaptchaSettings['public_key']) || empty($recaptchaSettings['public_key'])) {
-            \TYPO3\CMS\Core\Utility\GeneralUtility::sysLog(
+            /** @var \TYPO3\CMS\Core\Log\Logger $logger */
+            $logger = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+                \TYPO3\CMS\Core\Log\LogManager::class
+            )->getLogger(__CLASS__);
+            $logger->log(
+                \TYPO3\CMS\Core\Log\LogLevel::WARNING,
                 'Recaptcha public key was empty.',
-                'mfc_belogin_captcha',
-                \TYPO3\CMS\Core\Utility\GeneralUtility::SYSLOG_SEVERITY_WARNING
+                ['extension' => 'mfc_belogin_captcha']
             );
         }
     }
