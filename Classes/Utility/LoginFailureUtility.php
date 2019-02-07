@@ -1,30 +1,16 @@
 <?php
 namespace Mfc\MfcBeloginCaptcha\Utility;
 
-/***************************************************************
- *  Copyright notice
+/**
+ * This file is developed by Marketing Factory Consulting GmbH.
  *
- *  (c) 2015 Sebastian Fischer <typo3@marketing-factory.de>
- *  All rights reserved
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 2
+ * of the License, or any later version.
  *
- *  This script is part of the TYPO3 project. The TYPO3 project is
- *  free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  The GNU General Public License can be found at
- *  http://www.gnu.org/copyleft/gpl.html.
- *
- *  This script is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  This copyright notice MUST APPEAR in all copies of the script!
- ***************************************************************/
-
-use TYPO3\CMS\Core\Database\Connection;
+ * For the full copyright and license information, please read the
+ * LICENSE.txt file that was distributed with this source code.
+ */
 
 class LoginFailureUtility
 {
@@ -43,30 +29,21 @@ class LoginFailureUtility
         $amount = (int) $amount;
 
         if (!isset(static::$register[$amount])) {
-            $table = 'sys_log';
+            $ip = \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('REMOTE_ADDR');
 
-            $queryBuilder = self::getQueryBuilderForTable($table);
-            $queryBuilder->getRestrictions()->removeAll();
-            $expression = $queryBuilder->expr();
+            $queryBuilder = self::getQueryBuilderForTable('sys_log');
             $rows = $queryBuilder
                 ->select('error')
-                ->from($table)
+                ->from('sys_log')
                 ->where(
-                    $expression->eq('type', $queryBuilder->createNamedParameter(255, \PDO::PARAM_INT)),
-                    $expression->in(
+                    $queryBuilder->expr()->eq('type', 255),
+                    $queryBuilder->expr()->in(
                         'details_nr',
-                        $queryBuilder->createNamedParameter([1,2], Connection::PARAM_INT_ARRAY)
+                        $queryBuilder->createNamedParameter([1, 2], \Doctrine\DBAL\Connection::PARAM_STR_ARRAY)
                     ),
-                    $expression->eq(
-                        'IP',
-                        $queryBuilder->createNamedParameter(
-                            \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('REMOTE_ADDR'),
-                            \PDO::PARAM_STR
-                        )
-                    ),
-                    $expression->gt('tstamp', $queryBuilder->createNamedParameter(time() - 86400, \PDO::PARAM_INT))
+                    $queryBuilder->expr()->eq('IP', $queryBuilder->createNamedParameter($ip, \PDO::PARAM_STR))
                 )
-                ->orderBy('tstamp', \TYPO3\CMS\Extbase\Persistence\QueryInterface::ORDER_DESCENDING)
+                ->orderBy('tstamp', 'DESC')
                 ->setMaxResults($amount)
                 ->execute()
                 ->fetchAll();
@@ -83,15 +60,17 @@ class LoginFailureUtility
         return static::$register[$amount];
     }
 
-    /**
-     * @param string $table
-     *
-     * @return \TYPO3\CMS\Core\Database\Query\QueryBuilder
-     */
-    protected static function getQueryBuilderForTable($table): \TYPO3\CMS\Core\Database\Query\QueryBuilder
+    protected static function getQueryBuilderForTable(string $table): \TYPO3\CMS\Core\Database\Query\QueryBuilder
     {
-        return \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
-            \TYPO3\CMS\Core\Database\ConnectionPool::class
-        )->getQueryBuilderForTable($table);
+        /** @var \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager */
+        $objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+            \TYPO3\CMS\Extbase\Object\ObjectManager::class
+        );
+        /** @var \TYPO3\CMS\Core\Database\Query\QueryBuilder $queryBuilder */
+        $queryBuilder = $objectManager
+            ->get(\TYPO3\CMS\Core\Database\ConnectionPool::class)
+            ->getQueryBuilderForTable($table);
+
+        return $queryBuilder;
     }
 }
