@@ -13,11 +13,9 @@ $EM_CONF['mfc_belogin_captcha'] = [
     'version' => '3.0.0',
     'constraints' => [
         'depends' => [
-            'typo3' => '8.7.0-9.2.99',
-            'php' => '5.5.0-0.0.0',
+            'typo3' => '8.7.0-9.5.99',
+            'php' => '7.0.0-0.0.0',
             'recaptcha' => ''
         ],
-        'conflicts' => [],
-        'suggests' => [],
     ],
 ];
