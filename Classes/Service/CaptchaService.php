@@ -1,5 +1,7 @@
 <?php
 namespace Mfc\MfcBeloginCaptcha\Service;
+use TYPO3\CMS\Sv\AbstractAuthenticationService;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -29,6 +31,14 @@ namespace Mfc\MfcBeloginCaptcha\Service;
  * @package Mfc\MfcBeloginCaptcha\Service
  */
 class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService {
+
+	/**
+	 * User object
+	 *
+	 * @var AbstractAuthenticationService
+	 */
+	public $pObj;
+
 	/**
 	 * Settings Service
 	 *
@@ -39,6 +49,7 @@ class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService {
 
 	public function __construct() {
 		$this->settingsService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('Mfc\\MfcBeloginCaptcha\\Service\\SettingsService');
+		$this->pObj = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Sv\\AbstractAuthenticationService');
 	}
 
 	/**
@@ -51,27 +62,59 @@ class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService {
 	 * @return integer Authentication statuscode, one of 0 or 100
 	 */
 	public function authUser() {
-		$result = 100;
+		$statuscode = 100;
 
 		if ($this->loginFailureCountGreater($this->settingsService->getByPath('failedTries'))) {
 				// read out challenge, answer and remote_addr
-			$data = array(
-				'remoteip' => $_SERVER['REMOTE_ADDR'],
-				'challenge' => trim(\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('recaptcha_challenge_field')),
-				'response' => trim(\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('recaptcha_response_field')),
-				'privatekey' => $this->settingsService->getByPath('private_key'),
-			);
+			$result = $this->validateReCaptcha();
 
-				// first discard useless input
-			if (empty($data['challenge']) || empty($data['response'])) {
-				$result = 0;
-				$GLOBALS['T3_VAR']['recaptcha_error'] = 'empty';
+			if (!$result['verified']) {
+				$statuscode = 0;
+				$this->pObj->writelog(
+					255,
+					3,
+					3,
+					3,
+					'Login-attempt from %s (%s) for %s, captcha was not accepted! (Result: %s ERROR: %s)',
+					[
+						$this->authInfo['REMOTE_ADDR'],
+						$this->authInfo['REMOTE_HOST'],
+						$this->login['uname'],
+						$result['success'],
+						$result['error'],
+					]
+			);
+			}
+		}
+
+		return $statuscode;
+	}
+
+	/**
+	 * Validate reCAPTCHA challenge/response
+	 *
+	 * @return array Array with verified- (boolean) and error-code (string)
+	 */
+	public function validateReCaptcha()
+	{
+		$request = [
+			'secret' => $this->settingsService->getByPath('private_key'),
+			'response' => trim(\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('g-recaptcha-response')),
+			'remoteip' => \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('REMOTE_ADDR'),
+		];
+
+		$result = ['verified' => false, 'error' => ''];
+		if (empty($request['response'])) {
+			$result['error'] = 'missing-input-response';
+		} else {
+			$response = $this->queryVerificationServer($request);
+			if (is_string($response)) {
+				$result['error'] = $response;
+			} elseif ($response['success']) {
+				$result['verified'] = true;
 			} else {
-				$response = $this->queryVerificationServer($data);
-				if (!$response || strtolower($response[0]) == 'false') {
-					$result = 0;
-					$GLOBALS['T3_VAR']['recaptcha_error'] = $response[1];
-				}
+				$result['error'] = serialize($response['error-codes']);
+				$result['success'] = $response['success'];
 			}
 		}
 
@@ -82,21 +125,21 @@ class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService {
 	 * Query reCAPTCHA server for captcha-verification
 	 *
 	 * @param array $data
-	 * @return array Array with verified- (boolean) and error-code (string)
+	 * @return array|string Array with verified- (boolean) and error-code (string)
 	 */
-	protected function queryVerificationServer($data) {
-			// find first occurence of '//' inside server string
+	protected function queryVerificationServer($data)
+	{
 		$verifyServerInfo = @parse_url($this->settingsService->getByPath('verify_server'));
 
 		if (empty($verifyServerInfo)) {
-			$response = array(FALSE, 'recaptcha-not-reachable');
-		} else {
-			$paramStr = \TYPO3\CMS\Core\Utility\GeneralUtility::implodeArrayForUrl('', $data);
-			$response = \TYPO3\CMS\Core\Utility\GeneralUtility::getURL($this->settingsService->getByPath('verify_server') . '?' . $paramStr);
-			$response = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(LF, $response);
+			return [false, 'recaptcha-not-reachable'];
 		}
 
-		return $response;
+		$request = \TYPO3\CMS\Core\Utility\GeneralUtility::implodeArrayForUrl('', $data);
+		$response = \TYPO3\CMS\Core\Utility\GeneralUtility::getUrl($this->settingsService->getByPath('verify_server') . '?' . $request);
+
+		$decodedReponse = json_decode($response, true);
+		return is_array($decodedReponse) ? $decodedReponse : 'Response of request to server: ' . $response;
 	}
 
 	/**

@@ -75,7 +75,7 @@ class LoginControllerSlot {
 		$marker['CAPTCHA'] = '';
 
 		if ($this->loginFailureCountGreater($this->settingsService->getByPath('failedTries'))) {
-			$marker['CAPTCHA'] = $this->getReCaptcha();
+			$marker['CAPTCHA'] = '<div class="g-recaptcha" data-sitekey="'. $this->settingsService->getByPath('public_key') .'"></div>';
 		}
 
 		$marker['FORM'] = $this->renderCaptchaError($marker['FORM']);

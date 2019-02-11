@@ -35,7 +35,7 @@ class Tx_MfcBeloginCaptcha_Hook_BackendLoginHook {
 		$marker['CAPTCHA'] = '';
 
 		if ($this->loginFailureCountGreater($this->settingsService->getByPath('failedTries'))) {
-			$marker['CAPTCHA'] = '<div style="margin-top: 5px">' . $this->getReCaptcha() . '</div>';
+			$marker['CAPTCHA'] = '<div class="g-recaptcha" data-sitekey="'. $this->settingsService->getByPath('public_key') .'"></div>';
 		}
 
 		$marker['FORM'] = $this->renderCaptchaError($marker['FORM']);
