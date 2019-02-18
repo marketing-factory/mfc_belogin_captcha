@@ -71,7 +71,13 @@ class SettingsService implements \TYPO3\CMS\Core\SingletonInterface
      */
     public function getByPath($path)
     {
-        return \TYPO3\CMS\Extbase\Reflection\ObjectAccess::getPropertyPath($this->getSettings(), $path);
+        $pathValue = \TYPO3\CMS\Extbase\Reflection\ObjectAccess::getPropertyPath($this->getSettings(), $path);
+
+        if (!$pathValue) {
+            $pathValue = \TYPO3\CMS\Extbase\Reflection\ObjectAccess::getPropertyPath($this->getSettings('recaptcha'), $path);
+        }
+
+        return $pathValue;
     }
 
 
