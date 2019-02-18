@@ -5,12 +5,17 @@
   "type": "typo3-cms-extension",
   "authors": [
     {
+      "name": "Marketing Factory Consulting GmbH",
+      "email": "typo3@marketing-factory.de"
+    },
+    {
       "name": "Alexander Schnitzler",
       "email": "typo3@alexanderschnitzler.de"
     }
   ],
   "require": {
-    "php": ">=5.5.0"
+    "php": ">=5.5.0",
+    "evoweb/recaptcha": "^7.2.0"
   },
   "autoload": {
     "psr-4": {
