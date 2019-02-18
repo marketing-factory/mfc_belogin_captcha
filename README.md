@@ -15,9 +15,6 @@ This extension adds a configurable captcha to the backend login after a give amo
 
 ### 1) Installation
 
-#### Manual installations
-Download the extension **mfc_belogin_captcha** either with the browser from typo3.org or github and upload it into the installation in the admin tools extensions, or directly in the admin tools extensions with the integrated search.
-
 #### Composer installations
 
 ```
