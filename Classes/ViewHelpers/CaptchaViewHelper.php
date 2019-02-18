@@ -25,6 +25,7 @@ namespace Mfc\MfcBeloginCaptcha\ViewHelpers;
  ***************************************************************/
 
 use Mfc\MfcBeloginCaptcha\Service\SettingsService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class CaptchaViewHelper
@@ -39,12 +40,19 @@ class CaptchaViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractTagBase
     public $settingsService = null;
 
     /**
+     * @var \TYPO3\CMS\Extbase\Object\ObjectManagerInterface
+     */
+    protected $objectManager;
+
+    /**
      * CaptchaViewHelper constructor.
      */
     public function __construct()
     {
         parent::__construct();
-
+        if (! ($this->objectManager instanceof \TYPO3\CMS\Extbase\Object\ObjectManagerInterface)) {
+            $this->objectManager  = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\ObjectManager::class);
+        }
         $this->settingsService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(SettingsService::class);
     }
 
