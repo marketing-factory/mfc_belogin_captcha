@@ -3,7 +3,7 @@
 $EM_CONF['mfc_belogin_captcha'] = [
     'title' => 'Backend Login Captcha',
     'description' => 'Add an configurable captcha to the backend login after a give amount of failed login tries',
-    'version' => '4.0.0',
+    'version' => '3.1.1',
     'author' => 'Simon Schmidt, Christian Hellmund, Alexander Schnitzler',
     'author_email' => 'typo3@marketing-factory.de',
     'author_company' => 'Marketing Factory Consulting GmbH',
