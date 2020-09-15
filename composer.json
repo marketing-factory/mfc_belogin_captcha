@@ -6,12 +6,17 @@
 	"version": "4.1.0",
 	"authors": [
 		{
-          "name": "Marketing Factory Consulting GmbH",
-          "email": "typo3@marketing-factory.de"
-        },
-        {
+		  "name": "Marketing Factory Consulting GmbH",
+		  "email": "typo3@marketing-factory.de"
+		},
+		{
 			"name": "Alexander Schnitzler",
 			"email": "typo3@alexanderschnitzler.de"
+		},
+		{
+			"name": "Karoline Steinfatt",
+			"homepage": "https://www.marketing-factory.de/",
+			"role": "Maintainer"
 		}
 	],
 	"require": {
