@@ -3,7 +3,7 @@
 	"description": "Add a configurable captcha to the backend login after a give amount of failed login tries",
 	"license": "proprietary",
 	"type": "typo3-cms-extension",
-	"version": "4.1.0",
+	"version": "5.0.0",
 	"authors": [
 		{
 		  "name": "Marketing Factory Consulting GmbH",
@@ -20,9 +20,9 @@
 		}
 	],
 	"require": {
-		"php": ">=7.0.0",
-		"typo3/cms-core": ">=9.4.0",
-		"evoweb/recaptcha": "^9.0.0"
+		"php": ">=7.2.0",
+		"typo3/cms-core": ">=10.4.0",
+		"evoweb/recaptcha": "^10.0.0"
 	},
 	"autoload": {
 		"psr-4": {
