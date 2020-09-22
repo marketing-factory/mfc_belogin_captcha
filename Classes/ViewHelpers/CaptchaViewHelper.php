@@ -32,7 +32,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  *
  * @package Mfc\MfcBeloginCaptcha\ViewHelpers
  */
-class CaptchaViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractTagBasedViewHelper
+class CaptchaViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractTagBasedViewHelper
 {
     /**
      * @var SettingsService

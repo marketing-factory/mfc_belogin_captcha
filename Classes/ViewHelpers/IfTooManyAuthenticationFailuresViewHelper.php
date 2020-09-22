@@ -31,7 +31,7 @@ use Mfc\MfcBeloginCaptcha\Service\SettingsService;
  *
  * @package Mfc\MfcBeloginCaptcha\ViewHelpers
  */
-class IfTooManyAuthenticationFailuresViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractConditionViewHelper
+class IfTooManyAuthenticationFailuresViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractConditionViewHelper
 {
     /**
      * @var SettingsService

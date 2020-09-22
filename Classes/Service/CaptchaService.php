@@ -33,7 +33,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  *
  * @package Mfc\MfcBeloginCaptcha\Service
  */
-class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService
+class CaptchaService extends \TYPO3\CMS\Core\Authentication\AbstractAuthenticationService
 {
     /**
      * User object
