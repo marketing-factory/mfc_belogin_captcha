@@ -1,6 +1,12 @@
 <?php
 namespace Mfc\MfcBeloginCaptcha\Service;
 
+use Psr\Log\LoggerInterface;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use TYPO3\CMS\Core\Log\LogManager;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Psr\Log\LoggerAwareTrait;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -35,10 +41,13 @@ namespace Mfc\MfcBeloginCaptcha\Service;
  */
 class SettingsService implements \TYPO3\CMS\Core\SingletonInterface
 {
+    use LoggerAwareTrait;
+
     /**
      * @var array
      */
     protected static $settings = [];
+
 
     /**
      * Returns all settings.
@@ -50,9 +59,8 @@ class SettingsService implements \TYPO3\CMS\Core\SingletonInterface
     public function getSettings($extensionKey = 'mfc_belogin_captcha')
     {
         if (!isset(self::$settings[$extensionKey])) {
-            self::$settings[$extensionKey] = !is_array($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$extensionKey]) ?
-                unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$extensionKey]) :
-                $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$extensionKey];
+            self::$settings[$extensionKey] =
+                GeneralUtility::makeInstance(ExtensionConfiguration::class)->get($extensionKey);
         }
 
         return self::$settings[$extensionKey];
@@ -69,12 +77,15 @@ class SettingsService implements \TYPO3\CMS\Core\SingletonInterface
      *
      * @return mixed
      */
-    public function getByPath($path)
+    public function getByPath(string $path)
     {
         $pathValue = \TYPO3\CMS\Extbase\Reflection\ObjectAccess::getPropertyPath($this->getSettings(), $path);
 
         if (!$pathValue) {
-            $pathValue = \TYPO3\CMS\Extbase\Reflection\ObjectAccess::getPropertyPath($this->getSettings('recaptcha'), $path);
+            $pathValue = \TYPO3\CMS\Extbase\Reflection\ObjectAccess::getPropertyPath(
+                $this->getSettings('recaptcha'),
+                $path
+            );
         }
 
         return $pathValue;
@@ -92,11 +103,8 @@ class SettingsService implements \TYPO3\CMS\Core\SingletonInterface
         $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['recaptcha'] = serialize($recaptchaSettings);
 
         if (!isset($recaptchaSettings['public_key']) || empty($recaptchaSettings['public_key'])) {
-            \TYPO3\CMS\Core\Utility\GeneralUtility::sysLog(
-                'Recaptcha public key was empty.',
-                'mfc_belogin_captcha',
-                \TYPO3\CMS\Core\Utility\GeneralUtility::SYSLOG_SEVERITY_WARNING
-            );
+            $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+            $logger->warning('Recaptcha public key was empty.');
         }
     }
 }

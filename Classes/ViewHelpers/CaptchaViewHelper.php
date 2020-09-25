@@ -32,7 +32,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  *
  * @package Mfc\MfcBeloginCaptcha\ViewHelpers
  */
-class CaptchaViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractTagBasedViewHelper
+class CaptchaViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractTagBasedViewHelper
 {
     /**
      * @var SettingsService
@@ -74,7 +74,7 @@ class CaptchaViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractTagBase
             'class' => 'g-recaptcha',
             'data-sitekey' =>
                 $this->objectManager->get(\Evoweb\Recaptcha\Services\CaptchaService::class)->getReCaptcha(),
-            'style' => 'overflow: hidden; margin: 9px 0; width: 304px;'
+            'style' => 'overflow: hidden; margin: 9px -20px; width: 304px;'
         ]);
         $this->tag->forceClosingTag(true);
 

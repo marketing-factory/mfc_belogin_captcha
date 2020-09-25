@@ -17,8 +17,14 @@ This extension adds a configurable captcha to the backend login after a give amo
 
 #### Composer installations
 
+For TYPO3 v10
 ```
-composer require mfc/mfc-belogin-captcha ^4.0.0
+composer require mfc/mfc-belogin-captcha ^5.0.0
+
+
+For TYPO3 v9
+```
+composer require mfc/mfc-belogin-captcha ^4.1.0
 ```
 
 ### 3) Configure the extension
