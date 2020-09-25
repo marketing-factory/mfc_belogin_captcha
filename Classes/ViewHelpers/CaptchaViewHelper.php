@@ -74,7 +74,7 @@ class CaptchaViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractTagBas
             'class' => 'g-recaptcha',
             'data-sitekey' =>
                 $this->objectManager->get(\Evoweb\Recaptcha\Services\CaptchaService::class)->getReCaptcha(),
-            'style' => 'overflow: hidden; margin: 9px 0; width: 304px;'
+            'style' => 'overflow: hidden; margin: 9px -20px; width: 304px;'
         ]);
         $this->tag->forceClosingTag(true);
 
