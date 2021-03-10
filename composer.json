@@ -3,7 +3,7 @@
   "description": "Add a configurable captcha to the backend login after a give amount of failed login tries",
   "license": "proprietary",
   "type": "typo3-cms-extension",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "authors": [
     {
       "name": "Marketing Factory Consulting GmbH",
