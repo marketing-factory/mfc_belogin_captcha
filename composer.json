@@ -1,32 +1,37 @@
 {
-	"name": "mfc/mfc-belogin-captcha",
-	"description": "Add a configurable captcha to the backend login after a give amount of failed login tries",
-	"license": "proprietary",
-	"type": "typo3-cms-extension",
-	"version": "5.0.0",
-	"authors": [
-		{
-		  "name": "Marketing Factory Consulting GmbH",
-		  "email": "typo3@marketing-factory.de"
-		},
-		{
-			"name": "Alexander Schnitzler",
-			"email": "typo3@alexanderschnitzler.de"
-		},
-		{
-			"name": "Karoline Steinfatt",
-			"homepage": "https://www.marketing-factory.de/",
-			"role": "Maintainer"
-		}
-	],
-	"require": {
-		"php": ">=7.2.0",
-		"typo3/cms-core": ">=10.4.0",
-		"evoweb/recaptcha": "^10.0.0"
-	},
-	"autoload": {
-		"psr-4": {
-			"Mfc\\MfcBeloginCaptcha\\": "Classes/"
-		}
-	}
+  "name": "mfc/mfc-belogin-captcha",
+  "description": "Add a configurable captcha to the backend login after a give amount of failed login tries",
+  "license": "proprietary",
+  "type": "typo3-cms-extension",
+  "version": "5.0.0",
+  "authors": [
+    {
+      "name": "Marketing Factory Consulting GmbH",
+      "email": "typo3@marketing-factory.de"
+    },
+    {
+      "name": "Alexander Schnitzler",
+      "email": "typo3@alexanderschnitzler.de"
+    },
+    {
+      "name": "Karoline Steinfatt",
+      "homepage": "https://www.marketing-factory.de/",
+      "role": "Maintainer"
+    }
+  ],
+  "require": {
+    "php": ">=7.2.0",
+    "typo3/cms-core": ">=10.4.0",
+    "evoweb/recaptcha": "^10.0.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Mfc\\MfcBeloginCaptcha\\": "Classes/"
+    }
+  },
+  "extra": {
+    "typo3/cms": {
+      "extension-key": "mfc-belogin-captcha"
+    }
+  }
 }
