@@ -76,7 +76,8 @@ class CaptchaService extends \TYPO3\CMS\Sv\AbstractAuthenticationService
     {
         $statusCode = 100;
 
-        if ($this->settingsService->getByPath('public_key')
+        if ($this->login['status'] != 'sudo-mode'
+            && $this->settingsService->getByPath('public_key')
             && $this->settingsService->getByPath('private_key')
             && LoginFailureUtility::failuresEqual($this->settingsService->getByPath('failedTries'))
         ) {
