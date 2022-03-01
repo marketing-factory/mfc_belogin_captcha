@@ -6,6 +6,10 @@ TYPO3 Extension `mfc_belogin_captcha` (`mfc/mfc-belogin-captcha`)
 
 This extension adds a configurable captcha to the backend login after a give amount of failed login tries.
 
+#Important!
+
+Since TYPO3 Version 11 does have an internal [rate limit system](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/11.3/Feature-93825-RateLimitingForFailedLogins.html), we have decided to abandom the development of this extension for TYPO3 Version 11 and beyond. 
+
 
 ## 1. Features
 
